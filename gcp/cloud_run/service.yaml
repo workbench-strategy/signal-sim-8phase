@@ -1,0 +1,10 @@
+# Cloud Run service.yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: signal-sim-8phase
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/YOUR_PROJECT_ID/signal-sim-8phase

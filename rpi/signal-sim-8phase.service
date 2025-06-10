@@ -1,0 +1,9 @@
+[Unit]
+Description=Signal Sim 8-Phase Service
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/signal-sim-8phase/src/cli/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

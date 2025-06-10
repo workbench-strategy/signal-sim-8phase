@@ -1,0 +1,28 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+      - name: Run linters
+        run: |
+          poetry run black --check src tests
+          poetry run isort --check-only src tests
+          poetry run flake8 src tests
+      - name: Run tests
+        run: |
+          poetry run pytest --cov=src

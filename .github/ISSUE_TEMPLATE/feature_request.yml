@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: enhancement
+assignees: ''
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature!
+  - type: input
+    id: feature-summary
+    attributes:
+      label: Feature summary
+      description: Briefly describe the feature
+      placeholder: What do you want to see?
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature important?
+      placeholder: What problem does it solve?
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots

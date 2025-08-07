@@ -1,0 +1,99 @@
+{
+  "intersection_layout": {
+    "description": "8-Phase NEMA Dual-Ring Signal Controller",
+    "intersection_legs": {
+      "north_leg": {
+        "phases": [1, 6],
+        "movements": ["northbound_left", "southbound_left"],
+        "description": "North Leg - Left turns from both directions"
+      },
+      "south_leg": {
+        "phases": [3, 8],
+        "movements": ["northbound_through", "southbound_through"],
+        "description": "South Leg - Through movements from both directions"
+      },
+      "east_leg": {
+        "phases": [2, 7],
+        "movements": ["eastbound_left", "eastbound_through"],
+        "description": "East Leg - Left turn and through movement"
+      },
+      "west_leg": {
+        "phases": [5, 4],
+        "movements": ["westbound_left", "westbound_through"],
+        "description": "West Leg - Left turn and through movement"
+      }
+    },
+    "opposite_leg_pairs": [
+      {
+        "pair": [1, 6],
+        "description": "North Leg - Northbound/Southbound Left turns",
+        "movement_type": "protected_left"
+      },
+      {
+        "pair": [2, 5],
+        "description": "East/West Leg - Eastbound/Westbound Left turns",
+        "movement_type": "protected_left"
+      },
+      {
+        "pair": [3, 8],
+        "description": "South Leg - Northbound/Southbound Through movements",
+        "movement_type": "through"
+      },
+      {
+        "pair": [7, 4],
+        "description": "East/West Leg - Eastbound/Westbound Through movements",
+        "movement_type": "through"
+      }
+    ],
+    "phase_details": {
+      "1": {
+        "movement": "northbound_left",
+        "leg": "north",
+        "type": "protected",
+        "description": "Northbound Left (Protected) - North Leg"
+      },
+      "2": {
+        "movement": "eastbound_left",
+        "leg": "east",
+        "type": "protected",
+        "description": "Eastbound Left (Protected) - East Leg"
+      },
+      "3": {
+        "movement": "northbound_through",
+        "leg": "south",
+        "type": "through",
+        "description": "Northbound Through - South Leg"
+      },
+      "4": {
+        "movement": "westbound_through",
+        "leg": "west",
+        "type": "through",
+        "description": "Westbound Through - West Leg"
+      },
+      "5": {
+        "movement": "westbound_left",
+        "leg": "west",
+        "type": "protected",
+        "description": "Westbound Left (Protected) - West Leg"
+      },
+      "6": {
+        "movement": "southbound_left",
+        "leg": "north",
+        "type": "protected",
+        "description": "Southbound Left (Protected) - North Leg"
+      },
+      "7": {
+        "movement": "eastbound_through",
+        "leg": "east",
+        "type": "through",
+        "description": "Eastbound Through - East Leg"
+      },
+      "8": {
+        "movement": "southbound_through",
+        "leg": "south",
+        "type": "through",
+        "description": "Southbound Through - South Leg"
+      }
+    }
+  }
+}

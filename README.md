@@ -16,20 +16,61 @@ poetry install
 python src/cli/main.py
 ```
 
-## Intersection leg arrangement (example)
+## Features
 
-Run the example layout showing phases arranged by legs (1&6 north, 2&5 south, 3&8 east, 7&4 west):
+### Signal Indication Layout
+
+The system displays traffic signal phases arranged by intersection legs in an ASCII cross-shaped layout:
 
 ```bash
-python scripts/signal_sim_engine.py
+# Show compact layout (fits 80-column terminal)
+python src/cli/main.py layout
+
+# Show full layout with complete descriptions
+python src/cli/main.py layout --full
+
+# Show layout with signal states (R=Red, Y=Yellow, G=Green)
+python src/cli/main.py layout --states
 ```
 
-Expected output format (ASCII layout):
+### Signal Cycle Simulation
+
+Run a simulation showing signal phase transitions:
+
+```bash
+python src/cli/main.py simulate
+```
+
+### Demo Mode
+
+View all available layout demonstrations:
+
+```bash
+python src/cli/main.py demo
+```
+
+## Intersection Leg Arrangement
+
+Phases are arranged by intersection legs:
+- **North leg**: Phases 1 (left) & 6 (through)
+- **South leg**: Phases 2 (left) & 5 (through)  
+- **East leg**: Phases 3 (left) & 8 (through)
+- **West leg**: Phases 7 (through) & 4 (left)
+
+Example compact layout output:
 
 ```
-      [1: Northbound Left (Protected)]  [6: Northbound Through]
-[7: Westbound Through]  [4: Westbound Left (Protected)]      [3: Eastbound Left (Protected)]  [8: Eastbound Through]
-      [2: Southbound Left (Protected)]  [5: Southbound Through]
+                [1: NB Left]  [6: NB Thru]
+[7: WB Thru]  [4: WB Left]      [3: EB Left]  [8: EB Thru]
+                [2: SB Left]  [5: SB Thru]
+```
+
+With signal states:
+
+```
+                    [1: NB Left (G)]  [6: NB Thru (G)]
+[7: WB Thru (R)]  [4: WB Left (R)]      [3: EB Left (R)]  [8: EB Thru (R)]
+                    [2: SB Left (R)]  [5: SB Thru (R)]
 ```
 
 ## Contributing

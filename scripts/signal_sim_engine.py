@@ -40,6 +40,12 @@ PHASE_TO_SHORT_DESC: Dict[int, str] = {
 }
 
 
+LEG_PHASE_LAYOUT: Dict[str, List[Tuple[int, str]]] = {
+    "north": [(1, PHASE_TO_DESCRIPTION[1]), (6, PHASE_TO_DESCRIPTION[6])],
+    "south": [(2, PHASE_TO_DESCRIPTION[2]), (5, PHASE_TO_DESCRIPTION[5])],
+    "east": [(3, PHASE_TO_DESCRIPTION[3]), (8, PHASE_TO_DESCRIPTION[8])],
+    "west": [(7, PHASE_TO_DESCRIPTION[7]), (4, PHASE_TO_DESCRIPTION[4])],
+}
 def get_leg_phase_layout() -> Dict[str, List[Tuple[int, str]]]:
     """Return phases arranged by intersection leg as requested.
 

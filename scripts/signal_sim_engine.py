@@ -125,8 +125,7 @@ def calculate_ascii_layout_dimensions(
     ns_width = max(len(north_str), len(south_str))
     ew_width = len(west_str) + len(east_str)
     
-    # We need a gap between west and east that's at least as wide as north/south
-    min_gap = max(6, ns_width - ew_width + 6)
+    min_gap = max(MIN_CENTER_GAP, ns_width - ew_width + MIN_CENTER_GAP)
     
     return len(west_str), min_gap, ns_width
 

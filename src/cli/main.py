@@ -4,9 +4,11 @@
 import sys
 import argparse
 from typing import Optional
+import os
 
 # Add the scripts directory to the path so we can import signal_sim_engine
-sys.path.insert(0, './scripts')
+scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scripts')
+sys.path.insert(0, scripts_dir)
 
 try:
     from signal_sim_engine import (

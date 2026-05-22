@@ -3,17 +3,18 @@
 # 8-phase NEMA dual-ring signal controller logic
 # Simulates timing sequences for protected/permissive lefts,
 # pedestrian LPIs, and flashing yellows.
-# 
+#
 # Intersection Layout:
 #     Phase 3 (Northbound Through)     Phase 8 (Southbound Through)
 #     Phase 1 (Northbound Left)        Phase 6 (Southbound Left)
-#     
+#
 #     Phase 2 (Eastbound Left)         Phase 5 (Westbound Left)
 #     Phase 7 (Eastbound Through)      Phase 4 (Westbound Through)
 
-<<<<<
 from typing import Dict, List, Tuple, Optional
 from enum import Enum
+
+MIN_CENTER_GAP = 4
 
 
 class SignalState(Enum):
@@ -38,7 +39,7 @@ PHASE_TO_DESCRIPTION: Dict[int, str] = {
 
 PHASE_TO_SHORT_DESC: Dict[int, str] = {
     1: "NB Left",
-    2: "SB Left", 
+    2: "SB Left",
     3: "EB Left",
     4: "WB Left",
     5: "SB Thru",
@@ -48,14 +49,8 @@ PHASE_TO_SHORT_DESC: Dict[int, str] = {
 }
 
 
-LEG_PHASE_LAYOUT: Dict[str, List[Tuple[int, str]]] = {
-    "north": [(1, PHASE_TO_DESCRIPTION[1]), (6, PHASE_TO_DESCRIPTION[6])],
-    "south": [(2, PHASE_TO_DESCRIPTION[2]), (5, PHASE_TO_DESCRIPTION[5])],
-    "east": [(3, PHASE_TO_DESCRIPTION[3]), (8, PHASE_TO_DESCRIPTION[8])],
-    "west": [(7, PHASE_TO_DESCRIPTION[7]), (4, PHASE_TO_DESCRIPTION[4])],
-}
 def get_leg_phase_layout() -> Dict[str, List[Tuple[int, str]]]:
-    """Return phases arranged by intersection leg as requested.
+    """Return phases arranged by intersection leg.
 
     Legs are grouped as:
       - North: phases 1 and 6
@@ -99,7 +94,7 @@ def format_phase_with_state(phase_num: int, state: SignalState, compact: bool = 
 
 
 def format_leg_with_states(
-    phases: List[Tuple[int, str]], 
+    phases: List[Tuple[int, str]],
     states: Dict[int, SignalState],
     compact: bool = False
 ) -> str:
@@ -112,12 +107,11 @@ def format_leg_with_states(
 
 
 def calculate_ascii_layout_dimensions(
-    layout: Dict[str, List[Tuple[int, str]]], 
+    layout: Dict[str, List[Tuple[int, str]]],
     compact: bool = False,
     states: Optional[Dict[int, SignalState]] = None
 ) -> Tuple[int, int, int]:
     """Calculate dimensions needed for proper ASCII layout alignment."""
-    # Format all legs
     if states:
         north_str = format_leg_with_states(layout["north"], states, compact)
         south_str = format_leg_with_states(layout["south"], states, compact)
@@ -128,13 +122,12 @@ def calculate_ascii_layout_dimensions(
         south_str = format_phase_pair(layout["south"], compact)
         east_str = format_phase_pair(layout["east"], compact)
         west_str = format_phase_pair(layout["west"], compact)
-    
-    # Calculate max widths
+
     ns_width = max(len(north_str), len(south_str))
     ew_width = len(west_str) + len(east_str)
-    
+
     min_gap = max(MIN_CENTER_GAP, ns_width - ew_width + MIN_CENTER_GAP)
-    
+
     return len(west_str), min_gap, ns_width
 
 
@@ -143,20 +136,19 @@ def print_intersection_layout(
     states: Optional[Dict[int, SignalState]] = None
 ) -> None:
     """Print an ASCII layout to visualize phases by intersection legs.
-    
+
     Creates a cross-shaped layout with:
     - North leg at top
-    - South leg at bottom  
+    - South leg at bottom
     - East leg on right
     - West leg on left
-    
+
     Args:
         compact: Use compact phase descriptions to fit in 80 columns
         states: Optional dict mapping phase numbers to signal states
     """
     layout = get_leg_phase_layout()
-    
-    # Format phase pairs for each leg
+
     if states:
         north_str = format_leg_with_states(layout["north"], states, compact)
         south_str = format_leg_with_states(layout["south"], states, compact)
@@ -167,15 +159,12 @@ def print_intersection_layout(
         south_str = format_phase_pair(layout["south"], compact)
         east_str = format_phase_pair(layout["east"], compact)
         west_str = format_phase_pair(layout["west"], compact)
-    
-    # Calculate layout dimensions
+
     west_width, center_gap, ns_width = calculate_ascii_layout_dimensions(layout, compact, states)
-    
-    # Calculate padding for north/south to center them
+
     total_width = len(west_str) + center_gap + len(east_str)
     ns_padding = max(0, (total_width - ns_width) // 2)
-    
-    # Build the intersection layout
+
     print()
     print(" " * ns_padding + north_str)
     print(west_str + " " * center_gap + east_str)
@@ -186,26 +175,24 @@ def print_intersection_layout(
 def simulate_cycle() -> None:
     """Simulate a signal cycle with different phase states."""
     print("\n=== Signal Cycle Simulation ===")
-    
-    # Example phase states during a cycle
+
     example_states = {
-        1: SignalState.GREEN,      # NB Left green
-        2: SignalState.RED,        # SB Left red
-        3: SignalState.RED,        # EB Left red  
-        4: SignalState.RED,        # WB Left red
-        5: SignalState.RED,        # SB Thru red
-        6: SignalState.GREEN,      # NB Thru green
-        7: SignalState.RED,        # WB Thru red
-        8: SignalState.RED,        # EB Thru red
+        1: SignalState.GREEN,
+        2: SignalState.RED,
+        3: SignalState.RED,
+        4: SignalState.RED,
+        5: SignalState.RED,
+        6: SignalState.GREEN,
+        7: SignalState.RED,
+        8: SignalState.RED,
     }
-    
+
     print("\nCurrent Phase State (Phases 1 & 6 active):")
     print_intersection_layout(compact=True, states=example_states)
-    
-    # Example of yellow transition
+
     example_states[1] = SignalState.YELLOW
     example_states[6] = SignalState.YELLOW
-    
+
     print("\nTransition State (Phases 1 & 6 yellow):")
     print_intersection_layout(compact=True, states=example_states)
 
@@ -213,13 +200,13 @@ def simulate_cycle() -> None:
 def demonstrate_layouts() -> None:
     """Demonstrate different layout options."""
     print("=== Signal Indication Layout Demo ===")
-    
+
     print("\n1. Compact Layout (fits 80-column terminal):")
     print_intersection_layout(compact=True)
-    
+
     print("\n2. Full Layout (may wrap on narrow terminals):")
     print_intersection_layout(compact=False)
-    
+
     print("\n3. Layout with Signal States:")
     example_states = {
         1: SignalState.RED,
@@ -233,48 +220,7 @@ def demonstrate_layouts() -> None:
     }
     print_intersection_layout(compact=True, states=example_states)
 
-=======
-def simulate_cycle():
-    print("=== 8-Phase Signal Controller - Intersection Layout ===")
-    print()
-    print("Intersection Leg Arrangement:")
-    print("North Leg:  Phase 1 (Northbound Left) + Phase 6 (Southbound Left)")
-    print("South Leg:  Phase 8 (Southbound Through) + Phase 3 (Northbound Through)")
-    print("East Leg:   Phase 2 (Eastbound Left) + Phase 7 (Eastbound Through)")
-    print("West Leg:   Phase 5 (Westbound Left) + Phase 4 (Westbound Through)")
-    print()
-    
-    # Phase descriptions with intersection leg context
-    phases = {
-        1: "Northbound Left (Protected) - North Leg",
-        2: "Eastbound Left (Protected) - East Leg", 
-        3: "Northbound Through - South Leg",
-        4: "Westbound Through - West Leg",
-        5: "Westbound Left (Protected) - West Leg",
-        6: "Southbound Left (Protected) - North Leg",
-        7: "Eastbound Through - East Leg",
-        8: "Southbound Through - South Leg"
-    }
-    
-    print("Phase Sequence:")
-    for phase_num, description in phases.items():
-        print(f"Phase {phase_num}: {description}")
-    
-    print()
-    print("Opposite Leg Pairs:")
-    print("- Phases 1 & 6: North Leg (Northbound/Southbound Left)")
-    print("- Phases 2 & 5: East/West Leg (Eastbound/Westbound Left)")
-    print("- Phases 3 & 8: South Leg (Northbound/Southbound Through)")
-    print("- Phases 7 & 4: East/West Leg (Eastbound/Westbound Through)")
-    
-    # Logic placeholder for timing sequences
-    print()
-    print("Timing Logic: Protected left turns run in parallel with through movements")
-    print("from opposite legs to maximize intersection capacity."
 
 if __name__ == '__main__':
-    # Show different layout demonstrations
     demonstrate_layouts()
-    
-    # Run signal cycle simulation
     simulate_cycle()

@@ -7,7 +7,8 @@ from typing import Optional
 import os
 
 # Add the scripts directory to the path so we can import signal_sim_engine
-scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scripts')
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+scripts_dir = os.path.join(project_root, 'scripts')
 sys.path.insert(0, scripts_dir)
 
 try:

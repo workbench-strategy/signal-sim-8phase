@@ -1,0 +1,22 @@
+{
+  "profile_id": "demo.signals.main-1st",
+  "domain": "signals",
+  "display_name": "Main St & 1st Ave ASC (demo)",
+  "protocol": "ntcip",
+  "endpoint": "192.0.2.10",
+  "identity": "ASC-DEMO-001",
+  "capabilities": [
+    "get_phase_status",
+    "get_unit_identity",
+    "set_timing_plan"
+  ],
+  "mib_or_api_revision": "NTCIP-1202-scaffold",
+  "notes": "Stub-backed demo profile for NtcipManager / SignalsNtcipAdapter.",
+  "quirks": [
+    "Uses StubSnmpBackend unless PysnmpBackend is wired"
+  ],
+  "metadata": {
+    "corridor": "demo-arterial",
+    "neuma_phases": 8
+  }
+}

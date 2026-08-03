@@ -1,99 +1,74 @@
-# GIS-Based Location Map with Traffic Signal Nodes
+# ITS Systems Lab
 
-Modular Python repo for rapid experimentation.
+Personal workbench to **learn, replicate, and innovate** across Intelligent
+Transportation Systems -- CCTV, data stations, RWIS, VMS, signals, tunnel
+crossovers, plus a sandboxed airport learning area.
 
-## Features
+**Returning to this repo?** Open [`START_HERE.md`](START_HERE.md) first.
 
-- Visualize traffic signal nodes on a map
-- Integrate real-time data from APIs
-- Save and load traffic signal data from JSON files
-- Modular design for easy extension
+| Doc | Why |
+|-----|-----|
+| [`START_HERE.md`](START_HERE.md) | 5-minute re-entry |
+| [`docs/ITS_LAB_STRATEGY.md`](docs/ITS_LAB_STRATEGY.md) | Mission, domains, rules |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Locked platform seams |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Ordered next steps |
 
-## Usage
-
-```bash
-poetry install
-python src/cli/main.py
-```
-
-## Features
-
-### Signal Indication Layout
-
-The system displays traffic signal phases arranged by intersection legs in an ASCII cross-shaped layout:
+## Quick demos
 
 ```bash
-# Show compact layout (fits 80-column terminal)
-python src/cli/main.py layout
+# ITS platform shadow demo (signals adapter + policy)
+PYTHONPATH=src python -m its
 
-# Show full layout with complete descriptions
-python src/cli/main.py layout --full
+# NTCIP Manager GET phase status (stub ASC)
+PYTHONPATH=src python -m ntcip
 
-# Show layout with signal states (R=Red, Y=Yellow, G=Green)
+# Existing 8-phase layout / sim CLI
 python src/cli/main.py layout --states
-```
-
-### Signal Cycle Simulation
-
-Run a simulation showing signal phase transitions:
-
-```bash
 python src/cli/main.py simulate
+
+# Tests (verbose)
+PYTHONPATH=src python -m pytest -v tests/its tests/ntcip
 ```
 
-### Demo Mode
+## Layout
 
-View all available layout demonstrations:
+| Path | Role |
+|------|------|
+| `src/its/` | Shared platform: profiles, adapters, policies, shadow bus |
+| `src/ntcip/` | NTCIP Manager stack (protocol / MIB / business) |
+| `src/cli/` | Signal layout and cycle simulation |
+| `profiles/` | Sanitized device packs |
+| `captures/` | Anonymized traces |
+| `playbooks/` | Ops-language runbooks |
+| `domains/` | Per-asset notes (vms, rwis, cctv, tunnel, ...) |
+| `airport_lab/` | Airport security learning -- synthetic only |
+| `mibs/` | NTCIP SMI snippets |
+
+## Promotion path
+
+```
+capture -> model -> simulate -> shadow -> field
+```
+
+Policies default to **shadow / dry-run**. No production secrets in git.
+Airport work stays in `airport_lab/` until you have explicit authority.
+
+## Signal layout (legacy CLI)
+
+Phases by intersection leg:
+
+- North: 1 (left), 6 (through)
+- South: 2 (left), 5 (through)
+- East: 3 (left), 8 (through)
+- West: 7 (through), 4 (left)
 
 ```bash
+python src/cli/main.py layout --full
+python src/cli/main.py layout --states
 python src/cli/main.py demo
 ```
 
-## Intersection Leg Arrangement
-
-Phases are arranged by intersection legs:
-- **North leg**: Phases 1 (left) & 6 (through)
-- **South leg**: Phases 2 (left) & 5 (through)  
-- **East leg**: Phases 3 (left) & 8 (through)
-- **West leg**: Phases 7 (through) & 4 (left)
-
-Example compact layout output:
-
-```
-                [1: NB Left]  [6: NB Thru]
-[7: WB Thru]  [4: WB Left]      [3: EB Left]  [8: EB Thru]
-                [2: SB Left]  [5: SB Thru]
-```
-
-With signal states:
-
-```
-                    [1: NB Left (G)]  [6: NB Thru (G)]
-[7: WB Thru (R)]  [4: WB Left (R)]      [3: EB Left (R)]  [8: EB Thru (R)]
-                    [2: SB Left (R)]  [5: SB Thru (R)]
-```
-
-## NTCIP Manager Scaffold
-
-Three-layer NTCIP architecture (Manager-side GET/SET) lives under `src/ntcip/`:
-
-1. **Protocol Engine** (`ntcip.protocol`) -- async SNMP via pluggable backend (pysnmp seam + stub)
-2. **Object & MIB** (`ntcip.mib`) -- OID registry, ASN.1 types, NTCIP DateAndTime
-3. **Business Logic** (`ntcip.business`) -- `NtcipManager` facade and adapters
-
-```bash
-# Offline demo: async GET of ASC phase status (stub backend)
-PYTHONPATH=src python -m ntcip
-
-# NTCIP unit tests (verbose)
-make test-ntcip
-```
-
-See `docs/ntcip_architecture.md` for layering details and standard references.
-
 ## Contributing
 
-See `CONTRIBUTING.md`
-
-![Tests](https://github.com/user/repo/actions/workflows/main.yml/badge.svg)
-![License](https://img.shields.io/github/license/user/repo.svg)
+See `CONTRIBUTING.md`. Prefer playbooks + profiles after field work; keep
+drivers boring and experiments in policies.

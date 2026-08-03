@@ -1,5 +1,9 @@
 # NTCIP Stack Architecture
 
+> Broader lab mission: see [`ITS_LAB_STRATEGY.md`](ITS_LAB_STRATEGY.md) and
+> [`ARCHITECTURE.md`](ARCHITECTURE.md). NTCIP is the first protocol vertical
+> inside the multi-domain ITS lab (`src/its/` + `src/ntcip/`).
+
 ## Tech choices (scaffold defaults)
 
 | Concern | Choice |

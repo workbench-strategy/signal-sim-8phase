@@ -1,0 +1,15 @@
+{
+  "profile_id": "demo.rwis.pass-summit",
+  "domain": "rwis",
+  "display_name": "Pass Summit ESS (demo)",
+  "protocol": "ntcip",
+  "endpoint": "192.0.2.30",
+  "identity": "RWIS-DEMO-030",
+  "capabilities": ["get_status", "raise_weather_alert"],
+  "mib_or_api_revision": "NTCIP-1204-pending",
+  "notes": "Stub ESS observations for weather-responsive playbooks.",
+  "quirks": [],
+  "metadata": {
+    "standard": "NTCIP 1204"
+  }
+}

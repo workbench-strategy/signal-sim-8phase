@@ -17,7 +17,19 @@ precommit:
 	pre-commit run --all-files
 
 test:
-	pytest --cov=src --cov-report=term-missing
+	PYTHONPATH=src python -m pytest -v --tb=short tests
+
+test-cov:
+	PYTHONPATH=src python -m pytest -v --tb=short --cov=src --cov-report=term-missing tests
+
+test-ntcip:
+	PYTHONPATH=src python -m pytest -v --tb=long tests/ntcip
+
+test-its:
+	PYTHONPATH=src python -m pytest -v --tb=long tests/its
+
+test-lab:
+	PYTHONPATH=src python -m pytest -v --tb=long tests/its tests/ntcip
 
 clean:
 	rm -rf .pytest_cache .mypy_cache .coverage htmlcov build dist *.egg-info

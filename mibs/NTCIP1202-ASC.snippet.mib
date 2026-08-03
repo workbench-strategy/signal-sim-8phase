@@ -1,0 +1,13 @@
+-- NTCIP 1202 ASC Objects (illustrative snippet for scaffold docs)
+-- NOT a complete / normative MIB. Align with your certified module.
+--
+-- profiles.asc: 1.3.6.1.4.1.1206.4.2.1
+-- phaseStatusGroupGreens ::= { phaseStatusGroupEntry 4 }
+
+PHASE-STATUS-GROUP-GREENS OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit field of phases currently in Green. Bit 0 = phase 1."
+    ::= { phaseStatusGroupEntry 4 }

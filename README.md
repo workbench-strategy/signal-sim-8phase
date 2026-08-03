@@ -73,6 +73,24 @@ With signal states:
                     [2: SB Left (R)]  [5: SB Thru (R)]
 ```
 
+## NTCIP Manager Scaffold
+
+Three-layer NTCIP architecture (Manager-side GET/SET) lives under `src/ntcip/`:
+
+1. **Protocol Engine** (`ntcip.protocol`) -- async SNMP via pluggable backend (pysnmp seam + stub)
+2. **Object & MIB** (`ntcip.mib`) -- OID registry, ASN.1 types, NTCIP DateAndTime
+3. **Business Logic** (`ntcip.business`) -- `NtcipManager` facade and adapters
+
+```bash
+# Offline demo: async GET of ASC phase status (stub backend)
+PYTHONPATH=src python -m ntcip
+
+# NTCIP unit tests (verbose)
+make test-ntcip
+```
+
+See `docs/ntcip_architecture.md` for layering details and standard references.
+
 ## Contributing
 
 See `CONTRIBUTING.md`

@@ -1,3 +1,7 @@
 folium
 geopandas
 requests
+pytest
+pytest-asyncio
+# Optional: install pysnmp to enable PysnmpBackend
+# pysnmp>=5.0.0

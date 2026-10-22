@@ -1,92 +1,41 @@
-# 8-Phase Signal Controller - Intersection Layout
+# 8-Phase Signal Controller - WSDOT DM 1330 Layout
 
-## Intersection Diagram
+Reference: [1330.pdf](1330.pdf). **Through + left phase numbers sum to 7 (major) or 11 (minor) per approach.**
+
+## Major street (sum = 7)
+
+| Approach | Through | Left | Sum |
+|----------|---------|------|-----|
+| Northbound | 2 | 5 | 7 |
+| Southbound | 6 | 1 | 7 |
+
+## Minor street (sum = 11)
+
+| Approach | Through | Left | Sum |
+|----------|---------|------|-----|
+| Westbound | 4 | 7 | 11 |
+| Eastbound | 8 | 3 | 11 |
+
+## ASCII layout (left, then through on each leg)
 
 ```
-                    NORTH
-                ┌─────────────┐
-                │             │
-                │   Phase 3   │
-                │ Northbound  │
-                │   Through   │
-                │             │
-    WEST ───────┼─────────────┼─────── EAST
-                │             │
-                │   Phase 8   │
-                │ Southbound  │
-                │   Through   │
-                │             │
-                └─────────────┘
-                    SOUTH
-
-Detailed Layout:
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│                    NORTH LEG                                │
-│              ┌─────────────┐                               │
-│              │ Phase 1     │                               │
-│              │ Northbound  │                               │
-│              │ Left        │                               │
-│              └─────────────┘                               │
-│              ┌─────────────┐                               │
-│              │ Phase 6     │                               │
-│              │ Southbound  │                               │
-│              │ Left        │                               │
-│              └─────────────┘                               │
-│                                                             │
-│  WEST LEG    ┌─────────────┐    EAST LEG                   │
-│              │ Phase 5     │    ┌─────────────┐            │
-│              │ Westbound   │    │ Phase 2     │            │
-│              │ Left        │    │ Eastbound   │            │
-│              └─────────────┘    │ Left        │            │
-│              ┌─────────────┐    └─────────────┘            │
-│              │ Phase 4     │    ┌─────────────┐            │
-│              │ Westbound   │    │ Phase 7     │            │
-│              │ Through     │    │ Eastbound   │            │
-│              └─────────────┘    │ Through     │            │
-│                                 └─────────────┘            │
-│                    SOUTH LEG                                │
-│              ┌─────────────┐                               │
-│              │ Phase 3     │                               │
-│              │ Northbound  │                               │
-│              │ Through     │                               │
-│              └─────────────┘                               │
-│              ┌─────────────┐                               │
-│              │ Phase 8     │                               │
-│              │ Southbound  │                               │
-│              │ Through     │                               │
-│              └─────────────┘                               │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+               [5: NB Left]  [2: NB Thru]
+[7: WB Left]  [4: WB Thru]    [3: EB Left]  [8: EB Thru]
+               [1: SB Left]  [6: SB Thru]
 ```
 
-## Intersection Leg Arrangement
+## Approach pairs (concurrent / preemption)
 
-### North Leg (Phases 1 & 6)
-- **Phase 1**: Northbound Left (Protected)
-- **Phase 6**: Southbound Left (Protected)
+- **NB:** phases 2 + 5 (Channel A)
+- **SB:** phases 1 + 6 (Channel C)
+- **WB:** phases 4 + 7 (Channel B)
+- **EB:** phases 3 + 8 (Channel D)
 
-### South Leg (Phases 3 & 8)  
-- **Phase 3**: Northbound Through
-- **Phase 8**: Southbound Through
+## Demo timing sequence
 
-### East Leg (Phases 2 & 7)
-- **Phase 2**: Eastbound Left (Protected)
-- **Phase 7**: Eastbound Through
+1. Major lefts: 1 + 5
+2. Major through: 2 + 6
+3. Minor through: 4 + 8
+4. Minor lefts: 3 + 7
 
-### West Leg (Phases 5 & 4)
-- **Phase 5**: Westbound Left (Protected)
-- **Phase 4**: Westbound Through
-
-## Opposite Leg Pairs
-
-1. **Phases 1 & 6**: North Leg - Left turns from both directions
-2. **Phases 2 & 5**: East/West Leg - Left turns from both directions  
-3. **Phases 3 & 8**: South Leg - Through movements from both directions
-4. **Phases 7 & 4**: East/West Leg - Through movements from both directions
-
-## Signal Timing Logic
-
-- Protected left turns (Phases 1, 2, 5, 6) run in parallel with through movements from opposite legs
-- This arrangement maximizes intersection capacity by allowing compatible movements to run simultaneously
-- The dual-ring controller allows for flexible phase sequencing while maintaining safety
+Run: `python src/cli/main.py run`

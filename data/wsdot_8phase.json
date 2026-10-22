@@ -1,0 +1,124 @@
+{
+  "description": "8-phase NEMA dual-ring controller per WSDOT DM 1330 (docs/1330.pdf)",
+  "wsdot_dm1330": {
+    "reference": "docs/1330.pdf",
+    "exhibit": "1330-5",
+    "major_street": "north_south",
+    "phase_2_direction": "northbound",
+    "phase_sum_rules": {
+      "major": 7,
+      "minor": 11,
+      "description": "On each approach, through_phase + left_phase equals 7 (major) or 11 (minor)"
+    },
+    "approach_pairs": [
+      {"through": 2, "left": 5, "approach": "northbound", "street_role": "major", "sum": 7},
+      {"through": 6, "left": 1, "approach": "southbound", "street_role": "major", "sum": 7},
+      {"through": 4, "left": 7, "approach": "westbound", "street_role": "minor", "sum": 11},
+      {"through": 8, "left": 3, "approach": "eastbound", "street_role": "minor", "sum": 11}
+    ],
+    "preemption_channels": {
+      "A": [2, 5],
+      "B": [4, 7],
+      "C": [1, 6],
+      "D": [3, 8]
+    }
+  },
+  "intersection_layout": {
+    "intersection_legs": {
+      "north": {"phases": [5, 2], "description": "NB left (5) + NB thru (2), sum=7"},
+      "south": {"phases": [1, 6], "description": "SB left (1) + SB thru (6), sum=7"},
+      "west": {"phases": [7, 4], "description": "WB left (7) + WB thru (4), sum=11"},
+      "east": {"phases": [3, 8], "description": "EB left (3) + EB thru (8), sum=11"}
+    },
+    "phase_details": {
+      "1": {"movement": "southbound_left", "leg": "south", "street_role": "major", "short": "SB Left", "full": "Phase 1 - SB protected left (6+1=7)"},
+      "2": {"movement": "northbound_through", "leg": "north", "street_role": "major", "short": "NB Thru", "full": "Phase 2 - NB through (2+5=7)"},
+      "3": {"movement": "eastbound_left", "leg": "east", "street_role": "minor", "short": "EB Left", "full": "Phase 3 - EB protected left (8+3=11)"},
+      "4": {"movement": "westbound_through", "leg": "west", "street_role": "minor", "short": "WB Thru", "full": "Phase 4 - WB through (4+7=11)"},
+      "5": {"movement": "northbound_left", "leg": "north", "street_role": "major", "short": "NB Left", "full": "Phase 5 - NB protected left (2+5=7)"},
+      "6": {"movement": "southbound_through", "leg": "south", "street_role": "major", "short": "SB Thru", "full": "Phase 6 - SB through (6+1=7)"},
+      "7": {"movement": "westbound_left", "leg": "west", "street_role": "minor", "short": "WB Left", "full": "Phase 7 - WB protected left (4+7=11)"},
+      "8": {"movement": "eastbound_through", "leg": "east", "street_role": "minor", "short": "EB Thru", "full": "Phase 8 - EB through (8+3=11)"}
+    }
+  },
+  "dual_ring": {
+    "ring_1": [1, 2, 3, 4],
+    "ring_2": [5, 6, 7, 8],
+    "barriers": [
+      {"id": "barrier_23", "between": [2, 3], "description": "Ring 1 barrier between phases 2 and 3"},
+      {"id": "barrier_67", "between": [6, 7], "description": "Ring 2 barrier between phases 6 and 7"}
+    ],
+    "concurrent_groups": [
+      {"phases": [2, 5], "label": "NB approach (Channel A, thru+left=7)"},
+      {"phases": [1, 6], "label": "SB approach (Channel C, thru+left=7)"},
+      {"phases": [4, 7], "label": "WB approach (Channel B, thru+left=11)"},
+      {"phases": [3, 8], "label": "EB approach (Channel D, thru+left=11)"},
+      {"phases": [1, 5], "label": "Both major lefts (leading-lefts timing step)"},
+      {"phases": [2, 6], "label": "Both major throughs"},
+      {"phases": [4, 8], "label": "Both minor throughs"},
+      {"phases": [3, 7], "label": "Both minor lefts (lagging-lefts timing step)"}
+    ]
+  },
+  "timing_plan": {
+    "tick_seconds": 1,
+    "sequence_note": "DM1330 leading lefts pattern using WSDOT phase-sum pairing",
+    "steps": [
+      {
+        "label": "Major street protected lefts (Ph 1 SB + Ph 5 NB)",
+        "greens": [1, 5],
+        "green_time_s": 5,
+        "yellow_clearance_s": 3,
+        "all_red_s": 2
+      },
+      {
+        "label": "Major street through (Ph 2 NB + Ph 6 SB)",
+        "greens": [2, 6],
+        "green_time_s": 5,
+        "yellow_clearance_s": 3,
+        "all_red_s": 2
+      },
+      {
+        "label": "Minor street protected lefts (Ph 3 EB + Ph 7 WB)",
+        "greens": [3, 7],
+        "green_time_s": 5,
+        "yellow_clearance_s": 3,
+        "all_red_s": 2
+      },
+      {
+        "label": "Minor street through (Ph 4 WB + Ph 8 EB)",
+        "greens": [4, 8],
+        "green_time_s": 5,
+        "yellow_clearance_s": 3,
+        "all_red_s": 2
+      }
+    ]
+  },
+  "wiring": {
+    "channels": [
+      {"output_id": "OUT-01", "phase": 1, "indication": "green", "label": "Phase 1 green arrow (SB left)", "wsdot_ref": "1330.pdf Channel C"},
+      {"output_id": "OUT-02", "phase": 1, "indication": "yellow", "label": "Phase 1 yellow arrow (SB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-03", "phase": 1, "indication": "red", "label": "Phase 1 red (SB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-04", "phase": 2, "indication": "green", "label": "Phase 2 green ball (NB thru)", "wsdot_ref": "1330.pdf Channel A"},
+      {"output_id": "OUT-05", "phase": 2, "indication": "yellow", "label": "Phase 2 yellow ball (NB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-06", "phase": 2, "indication": "red", "label": "Phase 2 red (NB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-07", "phase": 3, "indication": "green", "label": "Phase 3 green arrow (EB left)", "wsdot_ref": "1330.pdf Channel D"},
+      {"output_id": "OUT-08", "phase": 3, "indication": "yellow", "label": "Phase 3 yellow arrow (EB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-09", "phase": 3, "indication": "red", "label": "Phase 3 red (EB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-10", "phase": 4, "indication": "green", "label": "Phase 4 green ball (WB thru)", "wsdot_ref": "1330.pdf Channel B"},
+      {"output_id": "OUT-11", "phase": 4, "indication": "yellow", "label": "Phase 4 yellow ball (WB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-12", "phase": 4, "indication": "red", "label": "Phase 4 red (WB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-13", "phase": 5, "indication": "green", "label": "Phase 5 green arrow (NB left)", "wsdot_ref": "1330.pdf Channel A"},
+      {"output_id": "OUT-14", "phase": 5, "indication": "yellow", "label": "Phase 5 yellow arrow (NB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-15", "phase": 5, "indication": "red", "label": "Phase 5 red (NB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-16", "phase": 6, "indication": "green", "label": "Phase 6 green ball (SB thru)", "wsdot_ref": "1330.pdf Channel C"},
+      {"output_id": "OUT-17", "phase": 6, "indication": "yellow", "label": "Phase 6 yellow ball (SB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-18", "phase": 6, "indication": "red", "label": "Phase 6 red (SB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-19", "phase": 7, "indication": "green", "label": "Phase 7 green arrow (WB left)", "wsdot_ref": "1330.pdf Channel B"},
+      {"output_id": "OUT-20", "phase": 7, "indication": "yellow", "label": "Phase 7 yellow arrow (WB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-21", "phase": 7, "indication": "red", "label": "Phase 7 red (WB left)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-22", "phase": 8, "indication": "green", "label": "Phase 8 green ball (EB thru)", "wsdot_ref": "1330.pdf Channel D"},
+      {"output_id": "OUT-23", "phase": 8, "indication": "yellow", "label": "Phase 8 yellow ball (EB thru)", "wsdot_ref": "1330.pdf"},
+      {"output_id": "OUT-24", "phase": 8, "indication": "red", "label": "Phase 8 red (EB thru)", "wsdot_ref": "1330.pdf"}
+    ]
+  }
+}

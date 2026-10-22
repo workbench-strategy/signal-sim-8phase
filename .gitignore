@@ -99,6 +99,9 @@ cython_debug/
 # VS Code
 .vscode/
 
+# Controller demo session
+.controller_demo_state.json
+
 # Environments
 .env
 .env.*
@@ -114,3 +117,7 @@ venv.bak/
 
 # System files
 Thumbs.db
+
+# large local artifacts
+user/logic.md
+docs/*.pdf

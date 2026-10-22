@@ -1,0 +1,15 @@
+{
+  "profile_id": "demo.vms.sb-approach",
+  "domain": "vms",
+  "display_name": "SB Approach DMS (demo)",
+  "protocol": "ntcip",
+  "endpoint": "192.0.2.20",
+  "identity": "VMS-DEMO-020",
+  "capabilities": ["get_status", "post_message"],
+  "mib_or_api_revision": "NTCIP-1203-pending",
+  "notes": "Stub adapter only. Replace with NTCIP 1203 driver when ready.",
+  "quirks": [],
+  "metadata": {
+    "standard": "NTCIP 1203"
+  }
+}

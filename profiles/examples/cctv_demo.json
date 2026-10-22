@@ -1,0 +1,17 @@
+{
+  "profile_id": "demo.cctv.tunnel-portal",
+  "domain": "cctv",
+  "display_name": "Tunnel Portal Camera (demo)",
+  "protocol": "onvif",
+  "endpoint": "192.0.2.40",
+  "identity": "CAM-DEMO-040",
+  "capabilities": ["get_status", "goto_preset"],
+  "mib_or_api_revision": "ONVIF-stub",
+  "notes": "Bridge profile for roadway/tunnel video; airport_lab may mirror this pattern with synthetic data only.",
+  "quirks": [
+    "Stub presets only; no RTSP URLs committed"
+  ],
+  "metadata": {
+    "standards": ["NTCIP 1205", "ONVIF"]
+  }
+}

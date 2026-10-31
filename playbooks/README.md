@@ -15,3 +15,4 @@ Copy `_template.md` for each new playbook.
 | `02_vms_message_shadow.md` | vms | Draft a VMS message in shadow/dry-run |
 | `03_rwis_weather_check.md` | rwis | Pull ESS stub observations |
 | `04_after_field_touch.md` | meta | Habit loop after any field visit |
+| `05_signal_cycle_tour.md` | signals | 5-minute teach tour: heads + Type 332 cabinet |

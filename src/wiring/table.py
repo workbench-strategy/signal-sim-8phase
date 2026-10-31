@@ -94,8 +94,14 @@ def format_energized_panel(
     if not outputs:
         return "  (none - all red or plan idle)"
     lines = []
+    by_id = {ch.output_id: ch for ch in wiring._channels}
     for out in outputs:
-        lines.append(f"  ON: {out.output_id} {out.label} [{out.wsdot_ref}]")
+        channel = by_id.get(out.output_id)
+        terminal = getattr(channel, "field_terminal", "") if channel else ""
+        terminal_bit = f" FT:{terminal}" if terminal else ""
+        lines.append(
+            f"  ON: {out.output_id}{terminal_bit} {out.label} [{out.wsdot_ref}]"
+        )
     return "\n".join(lines)
 
 

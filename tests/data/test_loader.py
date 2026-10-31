@@ -53,3 +53,11 @@ def test_wiring_head_type_arrow_for_left_phases():
     left_channel = next(ch for ch in config.wiring_channels if ch.phase == 5 and ch.indication == "green")
     assert left_channel.head_type == "arrow"
     assert left_channel.movement_group == "left"
+
+
+def test_wiring_channels_include_cabinet_field_terminals():
+    config = load_config()
+    channel = next(ch for ch in config.wiring_channels if ch.phase == 2 and ch.indication == "green")
+    assert channel.field_terminal == "623"
+    assert channel.cabinet_assembly == "Output File #1 LX"
+    assert "J-80.12" in channel.wsdot_ref

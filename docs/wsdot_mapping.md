@@ -41,8 +41,13 @@ Protected/permissive left displays use the through phase for the ball indication
 
 | File | Content |
 |------|---------|
-| [j80.12-00_e.pdf](WSDOT_Std_plans/j80.12-00_e.pdf) | Left-turn outputs |
-| [j80.15-00_e.pdf](WSDOT_Std_plans/j80.15-00_e.pdf) | Through outputs |
+| [j80.10-01_e.pdf](WSDOT_Std_plans/j80.10-01_e.pdf) | Type 332 signal cabinet layout (2070, input/output files, PDA, conflict monitor) |
+| [j80.12-00_e.pdf](WSDOT_Std_plans/j80.12-00_e.pdf) | Field output terminal panels (WSDOT FT numbers for phase R/Y/G) |
+| [j80.15-00_e.pdf](WSDOT_Std_plans/j80.15-00_e.pdf) | Detector test panel |
+
+Demo wiring in `data/wsdot_8phase.json` maps each phase indication to a placeholder
+`OUT-xx` channel and the matching J-80.12 field terminal (for example phase 2 green
+= FT 623 on Output File #1 LX).
 
 ## Corridor override
 

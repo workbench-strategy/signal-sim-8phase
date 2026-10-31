@@ -11,6 +11,7 @@ from xml.sax.saxutils import escape
 from src.controller.models import ControllerSnapshot, SignalState
 from src.data.loader import Wsdot8PhaseConfig, TimingStep
 from src.controller.timing_plan import TimingPlanRunner
+from src.display.teach import CABINET_ASSEMBLIES, build_teach_sequence
 
 
 SVG_WIDTH = 1240
@@ -263,20 +264,23 @@ def render_animation_html(
 ) -> str:
     """Render a self-contained HTML animation that cycles through SVG frames."""
     frames = [render_intersection_svg(snapshot, config) for snapshot in snapshots]
-    meta = [
-        {
-            "state": snapshot.step_phase.value,
-            "label": snapshot.step_label,
-            "remaining": snapshot.phase_in_step_remaining_s,
-            "elapsed": snapshot.elapsed_s,
-            "phases": [
-                phase
-                for phase, state in snapshot.phase_states.items()
-                if state in (SignalState.GREEN, SignalState.YELLOW)
-            ],
-        }
-        for snapshot in snapshots
-    ]
+    teach = build_teach_sequence(snapshots, config)
+    meta = []
+    for snapshot, teach_frame in zip(snapshots, teach):
+        meta.append(
+            {
+                "state": snapshot.step_phase.value,
+                "label": snapshot.step_label,
+                "remaining": snapshot.phase_in_step_remaining_s,
+                "elapsed": snapshot.elapsed_s,
+                "phases": [
+                    phase
+                    for phase, state in snapshot.phase_states.items()
+                    if state in (SignalState.GREEN, SignalState.YELLOW)
+                ],
+                "teach": teach_frame,
+            }
+        )
     phase_labels = [
         f"P{phase_num} {config.phase_details[phase_num].short}"
         for phase_num in range(1, 9)
@@ -284,183 +288,310 @@ def render_animation_html(
     frames_json = json.dumps(frames)
     meta_json = json.dumps(meta)
     phase_labels_json = json.dumps(phase_labels)
+    assemblies_json = json.dumps(list(CABINET_ASSEMBLIES))
     interval_ms = max(100, interval_ms)
-    lead_selected = ' selected' if plan == 'lead-lead' else ''
-    lag_selected = ' selected' if plan == 'lead-lag' else ''
+    lead_selected = " selected" if plan == "lead-lead" else ""
+    lag_selected = " selected" if plan == "lead-lag" else ""
+    rack_rows = "".join(
+        (
+            f'<div class="rack-row" data-assembly="{escape(item["id"])}">'
+            f'<span class="rack-label">{escape(item["label"])}</span>'
+            f'<span class="rack-ref">{escape(item["plan_ref"])}</span>'
+            f"</div>"
+        )
+        for item in CABINET_ASSEMBLIES
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Signal Sim 8-Phase 2D Animation</title>
+  <title>Signal Sim 8-Phase Teach Mode</title>
   <style>
     :root {{ color-scheme: dark; }}
-    body {{ margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #09111d; color: #e5edf7; }}
+    body {{ margin: 0; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; background: #09111d; color: #e5edf7; }}
     .shell {{ max-width: 1320px; margin: 0 auto; padding: 24px; }}
+    h1 {{ font-size: 1.35rem; margin: 0 0 8px; font-weight: 700; }}
+    .lede {{ color: #9fb0c8; margin: 0 0 18px; font-size: 0.95rem; max-width: 70ch; }}
     .toolbar {{ display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }}
-    .toolbar button {{ border: 1px solid #334155; background: #121a28; color: #e5edf7; padding: 10px 14px; border-radius: 12px; cursor: pointer; }}
+    .toolbar button, .toolbar select {{ border: 1px solid #334155; background: #121a28; color: #e5edf7; padding: 10px 14px; border-radius: 8px; cursor: pointer; }}
     .toolbar button:hover {{ background: #182235; }}
     .toolbar .meta {{ color: #9fb0c8; font-size: 14px; }}
-    .toolbar select {{ border: 1px solid #334155; background: #121a28; color: #e5edf7; padding: 10px 14px; border-radius: 12px; cursor: pointer; }}
-        .timing {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; margin: 6px 0 14px; }}
-        .timing .card {{ border: 1px solid #223047; background: #101827; border-radius: 16px; padding: 12px; }}
-        .timing .card h4 {{ margin: 0 0 8px; font-size: 13px; color: #c7d0df; }}
-        .timing .card .value {{ font-size: 12px; color: #9fb0c8; margin-top: 6px; }}
-        .timing input[type="range"] {{ width: 100%; }}
-        .phase-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }}
-        .phase-grid .card {{ border: 1px solid #223047; background: #101827; border-radius: 16px; padding: 10px 12px; }}
-        .phase-grid .card h4 {{ margin: 0 0 8px; font-size: 12px; color: #c7d0df; }}
-        .phase-grid .card .value {{ font-size: 11px; color: #9fb0c8; margin-top: 6px; }}
-        .phase-grid input[type="range"] {{ width: 100%; }}
-    .frame {{ border: 1px solid #253246; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35); background: #0b1220; }}
+    .speed {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; margin: 6px 0 14px; }}
+    .speed .card {{ border: 1px solid #223047; background: #101827; border-radius: 10px; padding: 12px; }}
+    .speed .card h4 {{ margin: 0 0 8px; font-size: 13px; color: #c7d0df; }}
+    .speed .card .value {{ font-size: 12px; color: #9fb0c8; margin-top: 6px; }}
+    .speed .hint {{ font-size: 11px; color: #7f8da3; margin-top: 4px; }}
+    .speed input[type="range"] {{ width: 100%; }}
+    .phase-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }}
+    .phase-grid .card {{ border: 1px solid #223047; background: #101827; border-radius: 10px; padding: 10px 12px; }}
+    .phase-grid .card h4 {{ margin: 0 0 8px; font-size: 12px; color: #c7d0df; }}
+    .phase-grid .card .value {{ font-size: 11px; color: #9fb0c8; margin-top: 6px; }}
+    .phase-grid input[type="range"] {{ width: 100%; }}
+    .frame {{ border: 1px solid #253246; border-radius: 16px; overflow: hidden; background: #0b1220; }}
     .frame svg {{ display: block; width: 100%; height: auto; }}
+    .teach-grid {{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-top: 16px; }}
+    @media (max-width: 900px) {{ .teach-grid, .speed, .phase-grid {{ grid-template-columns: 1fr; }} }}
+    .panel {{ border: 1px solid #223047; background: #101827; border-radius: 12px; padding: 16px; }}
+    .panel h2 {{ margin: 0 0 10px; font-size: 1rem; }}
+    .concept {{ font-size: 1.05rem; font-weight: 700; color: #f3f7ff; margin-bottom: 8px; }}
+    .why, .checkpoint, .refs {{ color: #b7c4d8; font-size: 0.92rem; line-height: 1.45; margin: 0 0 10px; }}
+    .checkpoint {{ border-left: 3px solid #7fd5ae; padding-left: 10px; }}
+    .pause-banner {{ display: none; margin: 0 0 12px; padding: 10px 12px; border: 1px solid #8a5a2b; background: #24180f; color: #f0d2a8; border-radius: 8px; font-size: 0.9rem; }}
+    .pause-banner.active {{ display: block; }}
+    .rack {{ display: grid; gap: 6px; }}
+    .rack-row {{ display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid #1f2a3c; border-radius: 8px; background: #0d1522; color: #8ea0b8; font-size: 0.82rem; }}
+    .rack-row.active {{ border-color: #3d8f6a; background: #10271d; color: #d7ffe9; }}
+    .rack-row.monitor.active {{ border-color: #d64545; background: #2a1212; color: #ffd0d0; }}
+    .rack-label {{ font-weight: 600; }}
+    .rack-ref {{ color: #7f8da3; white-space: nowrap; }}
+    .outputs {{ margin-top: 12px; display: grid; gap: 6px; max-height: 220px; overflow: auto; }}
+    .output {{ font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; padding: 7px 8px; border-radius: 6px; background: #0d1522; border: 1px solid #243247; color: #c9d6e8; }}
+    .output.on-green {{ border-color: #2f9e68; }}
+    .output.on-yellow {{ border-color: #c9a227; }}
+    .output.on-red {{ border-color: #b84b4b; }}
     input[type="range"] {{ width: min(680px, 100%); }}
   </style>
 </head>
 <body>
   <div class="shell">
+    <h1>Signal Sim 8-Phase Teach Mode</h1>
+    <p class="lede">
+      Intersection heads, dual-ring timing, and a Type 332 cabinet story share one playhead.
+      Presentation-speed sliders change playback only; ASC green/yellow/all-red seconds stay fixed in the exported frames.
+    </p>
     <div class="toolbar">
       <button id="toggle">Pause</button>
       <button id="prev">Prev</button>
       <button id="next">Next</button>
+      <button id="resumeTeach">Resume after checkpoint</button>
       <select id="planSelect"><option value="lead-lead"{lead_selected}>Plan A: Lead/Lead</option><option value="lead-lag"{lag_selected}>Plan B: Lead/Lag</option></select>
       <input id="scrub" type="range" min="0" max="{max(0, len(frames) - 1)}" value="0" />
       <div class="meta" id="counter" aria-live="polite"></div>
     </div>
-        <div class="timing">
-            <div class="card">
-                <h4>Cycle length</h4>
-                <input id="cycleTiming" type="range" min="4000" max="40000" value="{max(interval_ms * len(frames), 4000)}" />
-                <div class="value" id="cycleValue"></div>
-            </div>
-            <div class="card">
-                <h4>Green hold</h4>
-                <input id="greenTiming" type="range" min="150" max="2500" value="{interval_ms}" />
-                <div class="value" id="greenValue"></div>
-            </div>
-            <div class="card">
-                <h4>Yellow hold</h4>
-                <input id="yellowTiming" type="range" min="100" max="1800" value="{max(150, interval_ms // 2)}" />
-                <div class="value" id="yellowValue"></div>
-            </div>
-        </div>
-        <div class="phase-grid">
-            {''.join(
-                f'<div class="card"><h4>{escape(label)}</h4><input id="phaseTiming{idx+1}" type="range" min="50" max="200" value="100" /><div class="value" id="phaseValue{idx+1}"></div></div>'
-                for idx, label in enumerate(phase_labels)
-            )}
-        </div>
-        <div class="timing">
-            <div class="card">
-                <h4>Red / all-red hold</h4>
-                <input id="redTiming" type="range" min="80" max="1200" value="{max(100, interval_ms // 4)}" />
-                <div class="value" id="redValue"></div>
-            </div>
-        </div>
+    <div class="speed">
+      <div class="card">
+        <h4>Presentation cycle length</h4>
+        <input id="cycleTiming" type="range" min="4000" max="40000" value="{max(interval_ms * len(frames), 4000)}" />
+        <div class="value" id="cycleValue"></div>
+        <div class="hint">Display tempo only (not ASC cycle seconds)</div>
+      </div>
+      <div class="card">
+        <h4>Presentation green hold</h4>
+        <input id="greenTiming" type="range" min="150" max="2500" value="{interval_ms}" />
+        <div class="value" id="greenValue"></div>
+        <div class="hint">How long green frames stay on screen</div>
+      </div>
+      <div class="card">
+        <h4>Presentation yellow hold</h4>
+        <input id="yellowTiming" type="range" min="100" max="1800" value="{max(150, interval_ms // 2)}" />
+        <div class="value" id="yellowValue"></div>
+        <div class="hint">How long yellow frames stay on screen</div>
+      </div>
+      <div class="card">
+        <h4>Presentation red / all-red hold</h4>
+        <input id="redTiming" type="range" min="80" max="1200" value="{max(100, interval_ms // 4)}" />
+        <div class="value" id="redValue"></div>
+        <div class="hint">How long red / barrier frames stay on screen</div>
+      </div>
+    </div>
+    <div class="phase-grid">
+      {''.join(
+          f'<div class="card"><h4>{escape(label)}</h4><input id="phaseTiming{idx+1}" type="range" min="50" max="200" value="100" /><div class="value" id="phaseValue{idx+1}"></div><div class="hint">Relative presentation weight</div></div>'
+          for idx, label in enumerate(phase_labels)
+      )}
+    </div>
     <div class="frame" id="frame"></div>
+    <div class="teach-grid">
+      <div class="panel">
+        <h2>Teach panel</h2>
+        <div id="pauseBanner" class="pause-banner"></div>
+        <div class="concept" id="teachConcept"></div>
+        <p class="why" id="teachWhy"></p>
+        <p class="checkpoint" id="teachCheckpoint"></p>
+        <p class="refs" id="teachRefs"></p>
+      </div>
+      <div class="panel">
+        <h2>Type 332 cabinet (J-80.10)</h2>
+        <div class="rack" id="cabinetRack">{rack_rows}</div>
+        <div class="outputs" id="energizedOutputs" aria-live="polite"></div>
+      </div>
+    </div>
   </div>
   <script>
     const frames = {frames_json};
-        const meta = {meta_json};
-        const phaseLabels = {phase_labels_json};
+    const meta = {meta_json};
+    const phaseLabels = {phase_labels_json};
+    const assemblies = {assemblies_json};
     const frameEl = document.getElementById('frame');
     const counter = document.getElementById('counter');
     const scrub = document.getElementById('scrub');
     const toggle = document.getElementById('toggle');
-        const cycleTiming = document.getElementById('cycleTiming');
-        const greenTiming = document.getElementById('greenTiming');
-        const yellowTiming = document.getElementById('yellowTiming');
-        const redTiming = document.getElementById('redTiming');
-        const cycleValue = document.getElementById('cycleValue');
-        const greenValue = document.getElementById('greenValue');
-        const yellowValue = document.getElementById('yellowValue');
-        const redValue = document.getElementById('redValue');
-        const phaseControls = phaseLabels.map((_, idx) => document.getElementById(`phaseTiming${'{'}idx + 1{'}'}`));
-        const phaseValues = phaseLabels.map((_, idx) => document.getElementById(`phaseValue${'{'}idx + 1{'}'}`));
+    const pauseBanner = document.getElementById('pauseBanner');
+    const teachConcept = document.getElementById('teachConcept');
+    const teachWhy = document.getElementById('teachWhy');
+    const teachCheckpoint = document.getElementById('teachCheckpoint');
+    const teachRefs = document.getElementById('teachRefs');
+    const energizedOutputs = document.getElementById('energizedOutputs');
+    const cycleTiming = document.getElementById('cycleTiming');
+    const greenTiming = document.getElementById('greenTiming');
+    const yellowTiming = document.getElementById('yellowTiming');
+    const redTiming = document.getElementById('redTiming');
+    const cycleValue = document.getElementById('cycleValue');
+    const greenValue = document.getElementById('greenValue');
+    const yellowValue = document.getElementById('yellowValue');
+    const redValue = document.getElementById('redValue');
+    const phaseControls = phaseLabels.map((_, idx) => document.getElementById(`phaseTiming${'{'}idx + 1{'}'}`));
+    const phaseValues = phaseLabels.map((_, idx) => document.getElementById(`phaseValue${'{'}idx + 1{'}'}`));
     let index = 0;
     let playing = true;
     let timer = null;
-        let durations = [];
+    let durations = [];
+    let suppressPauseOnce = false;
 
-        function phaseDelay(kind) {{
-            if (kind === 'green') return Number(greenTiming.value);
-            if (kind === 'yellow') return Number(yellowTiming.value);
-            return Number(redTiming.value);
-        }}
+    function phaseDelay(kind) {{
+      if (kind === 'green') return Number(greenTiming.value);
+      if (kind === 'yellow') return Number(yellowTiming.value);
+      return Number(redTiming.value);
+    }}
 
-        function phaseFactor(phases) {{
-            if (!phases || phases.length === 0) {{
-                return 1;
-            }}
-            const sum = phases.reduce((acc, phaseNum) => acc + Number(phaseControls[phaseNum - 1].value), 0);
-            return (sum / phases.length) / 100;
-        }}
+    function phaseFactor(phases) {{
+      if (!phases || phases.length === 0) {{
+        return 1;
+      }}
+      const sum = phases.reduce((acc, phaseNum) => acc + Number(phaseControls[phaseNum - 1].value), 0);
+      return (sum / phases.length) / 100;
+    }}
 
-        function rebuildDurations() {{
-            const raw = meta.map((entry) => phaseDelay(entry.state) * phaseFactor(entry.phases));
-            const totalRaw = raw.reduce((acc, value) => acc + value, 0) || 1;
-            const targetCycle = Number(cycleTiming.value);
-            const scale = targetCycle / totalRaw;
-            durations = raw.map((value) => Math.max(60, Math.round(value * scale)));
-        }}
+    function rebuildDurations() {{
+      const raw = meta.map((entry) => phaseDelay(entry.state) * phaseFactor(entry.phases));
+      const totalRaw = raw.reduce((acc, value) => acc + value, 0) || 1;
+      const targetCycle = Number(cycleTiming.value);
+      const scale = targetCycle / totalRaw;
+      durations = raw.map((value) => Math.max(60, Math.round(value * scale)));
+    }}
 
-        function refreshTimingLabels() {{
-            cycleValue.textContent = `${'{'}cycleTiming.value{'}'} ms total cycle`;
-            greenValue.textContent = `${'{'}greenTiming.value{'}'} ms per green frame`;
-            yellowValue.textContent = `${'{'}yellowTiming.value{'}'} ms per yellow frame`;
-            redValue.textContent = `${'{'}redTiming.value{'}'} ms per red / all-red frame`;
-            phaseValues.forEach((node, idx) => {{
-                node.textContent = `${'{'}phaseControls[idx].value{'}'}% weight`;
-            }});
-        }}
+    function refreshTimingLabels() {{
+      cycleValue.textContent = `${'{'}cycleTiming.value{'}'} ms presentation cycle`;
+      greenValue.textContent = `${'{'}greenTiming.value{'}'} ms per green frame`;
+      yellowValue.textContent = `${'{'}yellowTiming.value{'}'} ms per yellow frame`;
+      redValue.textContent = `${'{'}redTiming.value{'}'} ms per red / all-red frame`;
+      phaseValues.forEach((node, idx) => {{
+        node.textContent = `${'{'}phaseControls[idx].value{'}'}% presentation weight`;
+      }});
+    }}
+
+    function renderTeach(current) {{
+      const teach = current.teach || {{}};
+      teachConcept.textContent = teach.concept || '';
+      teachWhy.textContent = teach.why || '';
+      teachCheckpoint.textContent = teach.checkpoint ? ('Checkpoint: ' + teach.checkpoint) : '';
+      teachRefs.textContent = (teach.plan_refs || []).join(' | ');
+      const active = new Set(teach.active_assemblies || []);
+      document.querySelectorAll('.rack-row').forEach((row) => {{
+        const id = row.getAttribute('data-assembly');
+        row.classList.toggle('active', active.has(id));
+        row.classList.toggle('monitor', id === 'conflict_monitor');
+      }});
+      const rows = teach.energized || [];
+      if (!rows.length) {{
+        energizedOutputs.innerHTML = '<div class="output">No load-switch channels energized (idle / all dark).</div>';
+      }} else {{
+        energizedOutputs.innerHTML = rows.map((row) => {{
+          const ft = row.field_terminal ? ` FT ${'{'}row.field_terminal{'}'}` : '';
+          return `<div class="output on-${'{'}row.indication{'}'}">${'{'}row.output_id{'}'}${'{'}ft{'}'}  |  Ph${'{'}row.phase{'}'} ${'{'}row.indication{'}'}  |  ${'{'}row.label{'}'}</div>`;
+        }}).join('');
+      }}
+    }}
 
     function showFrame(nextIndex) {{
       index = (nextIndex + frames.length) % frames.length;
       frameEl.innerHTML = frames[index];
-            const current = meta[index];
-            counter.textContent = `Frame ${'{'}index + 1{'}'} / ${'{'}frames.length{'}'} • ${'{'}current.label{'}'} • ${'{'}current.state.replaceAll('_', ' '){'}'}`;
+      const current = meta[index];
+      counter.textContent = `Frame ${'{'}index + 1{'}'} / ${'{'}frames.length{'}'}  |  ${'{'}current.label{'}'}  |  ${'{'}current.state.replaceAll('_', ' '){'}'}`;
       scrub.value = index;
+      renderTeach(current);
+      return current;
+    }}
+
+    function maybeAutoPause(current) {{
+      if (suppressPauseOnce) {{
+        suppressPauseOnce = false;
+        pauseBanner.classList.remove('active');
+        return false;
+      }}
+      if (current.teach && current.teach.pause) {{
+        playing = false;
+        toggle.textContent = 'Play';
+        pauseBanner.textContent = 'Auto-paused at all-red / barrier sync. Use the checkpoint question, then Resume after checkpoint.';
+        pauseBanner.classList.add('active');
+        window.clearTimeout(timer);
+        return true;
+      }}
+      pauseBanner.classList.remove('active');
+      return false;
     }}
 
     function safeStep(delta) {{
       window.clearTimeout(timer);
-      showFrame(index + delta);
+      const current = showFrame(index + delta);
+      maybeAutoPause(current);
       if (playing) loop();
     }}
 
-        function loop() {{
-            if (!playing) {{
-                return;
-            }}
-            const currentDelay = durations[index] || phaseDelay(meta[index].state);
-            showFrame(index + 1);
-            timer = window.setTimeout(loop, currentDelay);
+    function loop() {{
+      if (!playing) {{
+        return;
+      }}
+      const currentDelay = durations[index] || phaseDelay(meta[index].state);
+      timer = window.setTimeout(() => {{
+        const current = showFrame(index + 1);
+        if (!maybeAutoPause(current) && playing) {{
+          loop();
+        }}
+      }}, currentDelay);
     }}
 
     toggle.addEventListener('click', () => {{
       playing = !playing;
       toggle.textContent = playing ? 'Pause' : 'Play';
-            if (playing) {{
-                window.clearTimeout(timer);
-                loop();
-            }}
+      if (playing) {{
+        pauseBanner.classList.remove('active');
+        window.clearTimeout(timer);
+        loop();
+      }} else {{
+        window.clearTimeout(timer);
+      }}
     }});
     document.getElementById('prev').addEventListener('click', () => safeStep(-1));
     document.getElementById('next').addEventListener('click', () => safeStep(1));
-    scrub.addEventListener('input', (event) => {{ window.clearTimeout(timer); showFrame(Number(event.target.value)); if (playing) loop(); }});
+    document.getElementById('resumeTeach').addEventListener('click', () => {{
+      suppressPauseOnce = true;
+      playing = true;
+      toggle.textContent = 'Pause';
+      pauseBanner.classList.remove('active');
+      window.clearTimeout(timer);
+      loop();
+    }});
+    scrub.addEventListener('input', (event) => {{
+      window.clearTimeout(timer);
+      const current = showFrame(Number(event.target.value));
+      maybeAutoPause(current);
+      if (playing) loop();
+    }});
     document.getElementById('planSelect').addEventListener('change', (event) => {{
       window.location.href = window.location.pathname + '?plan=' + event.target.value;
     }});
-        [cycleTiming, greenTiming, yellowTiming, redTiming, ...phaseControls].forEach((control) => control.addEventListener('input', () => {{
-            refreshTimingLabels();
-            rebuildDurations();
-        }}));
+    [cycleTiming, greenTiming, yellowTiming, redTiming, ...phaseControls].forEach((control) => control.addEventListener('input', () => {{
+      refreshTimingLabels();
+      rebuildDurations();
+    }}));
 
     scrub.max = frames.length - 1;
     showFrame(0);
-        refreshTimingLabels();
-        rebuildDurations();
-        loop();
+    refreshTimingLabels();
+    rebuildDurations();
+    loop();
   </script>
 </body>
 </html>
@@ -475,5 +606,8 @@ def write_animation_html(
     plan: str = "lead-lead",
 ) -> Path:
     output = Path(output_path)
-    output.write_text(render_animation_html(snapshots, config, interval_ms=interval_ms, plan=plan), encoding="utf-8")
+    output.write_text(
+        render_animation_html(snapshots, config, interval_ms=interval_ms, plan=plan),
+        encoding="utf-8",
+    )
     return output

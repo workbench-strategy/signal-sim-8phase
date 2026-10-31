@@ -52,6 +52,8 @@ class WiringChannel:
     movement_group: str = ""
     street_role: str = ""
     head_type: str = ""
+    field_terminal: str = ""
+    cabinet_assembly: str = ""
 
 
 @dataclass
@@ -147,6 +149,10 @@ def load_config(path: Optional[Path] = None) -> Wsdot8PhaseConfig:
             ),
             street_role=phase_details[int(c["phase"])].street_role,
             head_type=_head_type(c["indication"], c["label"]),
+            field_terminal=str(c.get("field_terminal", "")),
+            cabinet_assembly=str(
+                c.get("cabinet_assembly", "Output File #1 LX")
+            ),
         )
         for c in raw["wiring"]["channels"]
     ]

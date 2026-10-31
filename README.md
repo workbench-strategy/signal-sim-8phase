@@ -16,8 +16,11 @@ python src/cli/main.py run
 # Animated traffic-signal cycle view
 python src/cli/main.py animate
 
-# Export a true 2D animated intersection view to HTML
+# Export teach-mode 2D HTML (intersection + Type 332 cabinet panel)
 python src/cli/main.py animate2d --output signal-sim-8phase-2d.html
+
+# 5-minute classroom tour
+# see playbooks/05_signal_cycle_tour.md
 
 # Manual advance one second at a time
 python src/cli/main.py reset
@@ -34,7 +37,7 @@ python src/cli/main.py wiring
 | -------- | -------- |
 | `run` | Auto-step full timing plan with intersection + wiring panels |
 | `animate` | Same controller loop, presented as an animated traffic-signal cycle |
-| `animate2d` | Export a 2D animated intersection as standalone HTML |
+| `animate2d` | Export teach-mode HTML: intersection, narration, Type 332 cabinet, barrier pause |
 | `step` | Advance one tick; state saved in `.controller_demo_state.json` |
 | `status` | Ring positions, barriers, step label |
 | `wiring` | Energized cabinet outputs with WSDOT refs |

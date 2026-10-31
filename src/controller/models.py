@@ -57,6 +57,7 @@ class ControllerSnapshot:
     phase_states: Dict[int, SignalState]
     active_greens: Set[int] = field(default_factory=set)
     plan_finished: bool = False
+    ped_states: Dict[int, SignalState] = field(default_factory=dict)
 
     def title_line(self) -> str:
         phase_name = self.step_phase.value.replace("_", " ").title()

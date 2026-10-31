@@ -16,3 +16,5 @@ def test_render_intersection_svg_contains_geometry(mini_config_path):
     assert "data-head-type=\"ball\"" in svg
     assert ">NB<" in svg
     assert ">SB<" in svg
+    assert 'data-ped-phase="2"' in svg
+    assert "WALK" in svg or "DW" in svg

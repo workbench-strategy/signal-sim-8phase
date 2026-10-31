@@ -153,5 +153,5 @@ def print_demo_frame(
     print_intersection_layout(compact=True, states=snapshot.phase_states)
     print("-" * 72)
     print("Wiring (energized load switches):")
-    print(format_energized_panel(wiring, snapshot.phase_states))
+    print(format_energized_panel(wiring, snapshot.phase_states, ped_states=snapshot.ped_states))
     print("=" * 72)

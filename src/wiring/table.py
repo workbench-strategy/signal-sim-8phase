@@ -29,7 +29,9 @@ class WiringTable:
         return cls(cfg.wiring_channels)
 
     def energized_outputs(
-        self, phase_states: Dict[int, SignalState]
+        self,
+        phase_states: Dict[int, SignalState],
+        ped_states: Dict[int, SignalState] | None = None,
     ) -> List[EnergizedOutput]:
         indication_map = {
             SignalState.GREEN: "green",
@@ -38,7 +40,12 @@ class WiringTable:
         }
         result: List[EnergizedOutput] = []
         for ch in self._channels:
-            state = phase_states.get(ch.phase, SignalState.RED)
+            if getattr(ch, "channel_kind", "vehicle") == "ped":
+                if ped_states is None:
+                    continue
+                state = ped_states.get(ch.phase, SignalState.RED)
+            else:
+                state = phase_states.get(ch.phase, SignalState.RED)
             if state == SignalState.OFF:
                 continue
             expected = indication_map.get(state)
@@ -76,26 +83,41 @@ class WiringTable:
     def summary_rows(self) -> List[str]:
         rows = []
         for phase, channels in sorted(self.channels_by_phase().items()):
-            green = next((ch.output_id for ch in channels if ch.indication == "green"), "-")
-            yellow = next((ch.output_id for ch in channels if ch.indication == "yellow"), "-")
-            red = next((ch.output_id for ch in channels if ch.indication == "red"), "-")
-            approach = channels[0].approach or "?"
-            group = channels[0].movement_group or "?"
-            head = channels[0].head_type or "?"
-            rows.append(f"Ph{phase} {approach:<2} {group:<6} {head:<5} G:{green:<7} Y:{yellow:<7} R:{red}")
+            vehicle = [ch for ch in channels if getattr(ch, "channel_kind", "vehicle") != "ped"]
+            ped = [ch for ch in channels if getattr(ch, "channel_kind", "vehicle") == "ped"]
+            if vehicle:
+                green = next((ch.output_id for ch in vehicle if ch.indication == "green"), "-")
+                yellow = next((ch.output_id for ch in vehicle if ch.indication == "yellow"), "-")
+                red = next((ch.output_id for ch in vehicle if ch.indication == "red"), "-")
+                approach = vehicle[0].approach or "?"
+                group = vehicle[0].movement_group or "?"
+                head = vehicle[0].head_type or "?"
+                rows.append(f"Ph{phase} {approach:<2} {group:<6} {head:<5} G:{green:<7} Y:{yellow:<7} R:{red}")
+            if ped:
+                green = next((ch.output_id for ch in ped if ch.indication == "green"), "-")
+                yellow = next((ch.output_id for ch in ped if ch.indication == "yellow"), "-")
+                red = next((ch.output_id for ch in ped if ch.indication == "red"), "-")
+                rows.append(f"Ph{phase} ped    ped   ped   G:{green:<7} Y:{yellow:<7} R:{red}")
         return rows
 
 
 def format_energized_panel(
     wiring: WiringTable,
     phase_states: Dict[int, SignalState],
+    ped_states: Dict[int, SignalState] | None = None,
 ) -> str:
-    outputs = wiring.energized_outputs(phase_states)
+    outputs = wiring.energized_outputs(phase_states, ped_states=ped_states)
     if not outputs:
         return "  (none - all red or plan idle)"
     lines = []
+    by_id = {ch.output_id: ch for ch in wiring._channels}
     for out in outputs:
-        lines.append(f"  ON: {out.output_id} {out.label} [{out.wsdot_ref}]")
+        channel = by_id.get(out.output_id)
+        terminal = getattr(channel, "field_terminal", "") if channel else ""
+        terminal_bit = f" FT:{terminal}" if terminal else ""
+        lines.append(
+            f"  ON: {out.output_id}{terminal_bit} {out.label} [{out.wsdot_ref}]"
+        )
     return "\n".join(lines)
 
 

@@ -29,16 +29,22 @@ python src/cli/main.py animate2d --output /tmp/signal-teach.html --plan lead-lea
 
 3. Narrate while it plays (about 5 minutes of wall clock with default presentation speed):
    - Intersection heads change color from the dual-ring timing plan.
-   - Teach panel names the concept (protected lefts, throughs, yellow, all-red).
-   - Type 332 rack highlights Controller, Output File #1 LX, and Conflict Monitor.
-   - Energized list shows `OUT-xx` plus J-80.12 field terminals (for example Ph2 green = FT 623).
+   - Ped overlays show Walk / FDW / Don't Walk on even through phases (J-80.12 ped FTs).
+   - Teach panel names the concept (protected lefts, throughs + Walk, yellow + FDW, all-red).
+   - Type 332 rack highlights Controller, Output File #1 LX, Conflict Monitor, and Detector Test Panel.
+   - Energized list shows `OUT-xx` / `PED-xx` plus J-80.12 field terminals (Ph2 green = FT 623; Ph2 Walk = FT 722).
 
-4. When playback auto-pauses at all-red / barrier sync:
+4. Detector Test Panel (J-80.15) demo:
+   - When major throughs are green (Ph2 + Ph6), flip **DET. 2** or **DET. 6** to Test.
+   - Status should read extending green (presentation) and Input File / Detector Test light on the rack.
+   - Flip a detector while its phase is red to show call latched / waiting.
+
+5. When playback auto-pauses at all-red / barrier sync:
    - Ask the checkpoint question on screen.
    - Point at Conflict Monitor + Output File #1 LX on the rack diagram.
    - Click **Resume after checkpoint**.
 
-5. Optional compare plan:
+6. Optional compare plan:
 
 ```bash
 python src/cli/main.py animate2d --output /tmp/signal-teach-lag.html --plan lead-lag
@@ -46,7 +52,7 @@ python src/cli/main.py animate2d --output /tmp/signal-teach-lag.html --plan lead
 
 Open both tabs and contrast lead/lead concurrent pairs vs lead/lag approach pairs.
 
-6. Optional terminal companion (same controller truth):
+7. Optional terminal companion (same controller truth):
 
 ```bash
 python src/cli/main.py wiring-summary

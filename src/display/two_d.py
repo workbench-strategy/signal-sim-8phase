@@ -66,6 +66,7 @@ def apply_plan(config: Wsdot8PhaseConfig, plan: str) -> Wsdot8PhaseConfig:
             timing_steps=LEAD_LAG_STEPS,
             tick_seconds=config.tick_seconds,
             wiring_channels=config.wiring_channels,
+            detector_channels=list(config.detector_channels),
         )
     return config
 
@@ -139,6 +140,33 @@ def _head(phase: int, label: str, leg: str, state: SignalState, x: int, y: int, 
     )
 
 
+def _ped_label(state: SignalState) -> str:
+    if state == SignalState.GREEN:
+        return "WALK"
+    if state == SignalState.YELLOW:
+        return "FDW"
+    return "DW"
+
+
+def _ped_indicator(phase: int, state: SignalState, x: int, y: int) -> str:
+    color = _state_color(state)
+    label = _ped_label(state)
+    return (
+        f'<g data-ped-phase="{phase}" data-ped-state="{state.value}">'
+        f'<rect x="{x - 28}" y="{y - 16}" width="56" height="32" rx="6" fill="{color}" stroke="#111827" stroke-width="2" />'
+        f'{_text(x, y + 5, f"P{phase} {label}", size=11, color="#081018", weight="700")}'
+        f'</g>'
+    )
+
+
+PED_LAYOUT = {
+    2: (520, 250),  # NB thru / north crosswalk
+    6: (320, 530),  # SB thru / south crosswalk
+    4: (250, 300),  # WB thru / west crosswalk
+    8: (590, 520),  # EB thru / east crosswalk
+}
+
+
 def _state_badge(state: SignalState) -> str:
     color = _state_color(state)
     return f'<span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:12px;height:12px;border-radius:50%;background:{color};display:inline-block;"></span>{escape(state.name.title())}</span>'
@@ -202,6 +230,10 @@ def render_intersection_svg(snapshot: ControllerSnapshot, config: Wsdot8PhaseCon
     for head in heads:
         state = phase_states.get(head.phase, SignalState.OFF)
         parts.append(_head(head.phase, head.label, head.leg, state, head.x, head.y, head.head_type))
+
+    for ped_phase, (px, py) in PED_LAYOUT.items():
+        ped_state = snapshot.ped_states.get(ped_phase, SignalState.RED)
+        parts.append(_ped_indicator(ped_phase, ped_state, px, py))
 
     approach_groups = {}
     for head in heads:
@@ -289,6 +321,19 @@ def render_animation_html(
     meta_json = json.dumps(meta)
     phase_labels_json = json.dumps(phase_labels)
     assemblies_json = json.dumps(list(CABINET_ASSEMBLIES))
+    detectors_json = json.dumps(
+        [
+            {
+                "detector_id": det.detector_id,
+                "label": det.label,
+                "connect": det.connect,
+                "phase": det.phase,
+                "kind": det.kind,
+                "plan_ref": det.plan_ref,
+            }
+            for det in config.detector_channels
+        ]
+    )
     interval_ms = max(100, interval_ms)
     lead_selected = " selected" if plan == "lead-lead" else ""
     lag_selected = " selected" if plan == "lead-lag" else ""
@@ -300,6 +345,17 @@ def render_animation_html(
             f"</div>"
         )
         for item in CABINET_ASSEMBLIES
+    )
+    detector_rows_html = "".join(
+        (
+            f'<label class="det-row" data-detector="{escape(det.detector_id)}" data-phase="{det.phase}">'
+            f'<input type="checkbox" class="det-switch" data-phase="{det.phase}" data-kind="{escape(det.kind)}" />'
+            f'<span class="det-label">{escape(det.label)}</span>'
+            f'<span class="det-connect">{escape(det.connect)} to Ph{det.phase}</span>'
+            f'<span class="det-status" data-status-for="{escape(det.detector_id)}">idle</span>'
+            f"</label>"
+        )
+        for det in config.detector_channels
     )
     return f"""<!doctype html>
 <html lang="en">
@@ -350,6 +406,16 @@ def render_animation_html(
     .output.on-green {{ border-color: #2f9e68; }}
     .output.on-yellow {{ border-color: #c9a227; }}
     .output.on-red {{ border-color: #b84b4b; }}
+    .output.ped {{ opacity: 0.95; border-style: dashed; }}
+    .ped-line {{ margin: 0 0 10px; color: #9fb0c8; font-size: 0.86rem; }}
+    .det-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }}
+    .det-row {{ display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; border: 1px solid #223047; border-radius: 8px; padding: 8px; background: #0d1522; font-size: 0.78rem; }}
+    .det-row.active-serving {{ border-color: #2f9e68; background: #10271d; }}
+    .det-row.active-call {{ border-color: #c9a227; background: #24180f; }}
+    .det-label {{ font-weight: 700; color: #e5edf7; }}
+    .det-connect {{ grid-column: 2; color: #8ea0b8; }}
+    .det-status {{ grid-column: 2; color: #7fd5ae; }}
+    .det-hint {{ margin-top: 8px; color: #7f8da3; font-size: 0.78rem; }}
     input[type="range"] {{ width: min(680px, 100%); }}
   </style>
 </head>
@@ -357,8 +423,9 @@ def render_animation_html(
   <div class="shell">
     <h1>Signal Sim 8-Phase Teach Mode</h1>
     <p class="lede">
-      Intersection heads, dual-ring timing, and a Type 332 cabinet story share one playhead.
+      Intersection heads, ped Walk/FDW overlays, dual-ring timing, and a Type 332 cabinet story share one playhead.
       Presentation-speed sliders change playback only; ASC green/yellow/all-red seconds stay fixed in the exported frames.
+      Detector Test switches (J-80.15) extend green presentation when a matching phase is being served.
     </p>
     <div class="toolbar">
       <button id="toggle">Pause</button>
@@ -409,7 +476,11 @@ def render_animation_html(
         <div class="concept" id="teachConcept"></div>
         <p class="why" id="teachWhy"></p>
         <p class="checkpoint" id="teachCheckpoint"></p>
+        <p class="ped-line" id="teachPed"></p>
         <p class="refs" id="teachRefs"></p>
+        <h2>Detector Test Panel (J-80.15)</h2>
+        <div class="det-grid" id="detectorPanel">{detector_rows_html}</div>
+        <p class="det-hint">Flip a switch to Test: if that phase is green, presentation green hold extends (call extension). If red, status shows call latched for next service. Switches are momentary in the field; here they stay on so you can teach.</p>
       </div>
       <div class="panel">
         <h2>Type 332 cabinet (J-80.10)</h2>
@@ -423,6 +494,7 @@ def render_animation_html(
     const meta = {meta_json};
     const phaseLabels = {phase_labels_json};
     const assemblies = {assemblies_json};
+    const detectorCatalog = {detectors_json};
     const frameEl = document.getElementById('frame');
     const counter = document.getElementById('counter');
     const scrub = document.getElementById('scrub');
@@ -431,6 +503,7 @@ def render_animation_html(
     const teachConcept = document.getElementById('teachConcept');
     const teachWhy = document.getElementById('teachWhy');
     const teachCheckpoint = document.getElementById('teachCheckpoint');
+    const teachPed = document.getElementById('teachPed');
     const teachRefs = document.getElementById('teachRefs');
     const energizedOutputs = document.getElementById('energizedOutputs');
     const cycleTiming = document.getElementById('cycleTiming');
@@ -443,11 +516,18 @@ def render_animation_html(
     const redValue = document.getElementById('redValue');
     const phaseControls = phaseLabels.map((_, idx) => document.getElementById(`phaseTiming${'{'}idx + 1{'}'}`));
     const phaseValues = phaseLabels.map((_, idx) => document.getElementById(`phaseValue${'{'}idx + 1{'}'}`));
+    const detSwitches = Array.from(document.querySelectorAll('.det-switch'));
     let index = 0;
     let playing = true;
     let timer = null;
     let durations = [];
     let suppressPauseOnce = false;
+
+    function testedPhases() {{
+      return new Set(
+        detSwitches.filter((el) => el.checked).map((el) => Number(el.getAttribute('data-phase')))
+      );
+    }}
 
     function phaseDelay(kind) {{
       if (kind === 'green') return Number(greenTiming.value);
@@ -463,8 +543,17 @@ def render_animation_html(
       return (sum / phases.length) / 100;
     }}
 
+    function detectorExtendFactor(entry) {{
+      if (entry.state !== 'green') {{
+        return 1;
+      }}
+      const tested = testedPhases();
+      const hit = (entry.phases || []).some((phaseNum) => tested.has(phaseNum));
+      return hit ? 1.8 : 1;
+    }}
+
     function rebuildDurations() {{
-      const raw = meta.map((entry) => phaseDelay(entry.state) * phaseFactor(entry.phases));
+      const raw = meta.map((entry) => phaseDelay(entry.state) * phaseFactor(entry.phases) * detectorExtendFactor(entry));
       const totalRaw = raw.reduce((acc, value) => acc + value, 0) || 1;
       const targetCycle = Number(cycleTiming.value);
       const scale = targetCycle / totalRaw;
@@ -486,8 +575,14 @@ def render_animation_html(
       teachConcept.textContent = teach.concept || '';
       teachWhy.textContent = teach.why || '';
       teachCheckpoint.textContent = teach.checkpoint ? ('Checkpoint: ' + teach.checkpoint) : '';
+      teachPed.textContent = teach.ped_summary ? ('Ped overlaps: ' + teach.ped_summary) : '';
       teachRefs.textContent = (teach.plan_refs || []).join(' | ');
       const active = new Set(teach.active_assemblies || []);
+      const tested = testedPhases();
+      if (tested.size) {{
+        active.add('detector_test');
+        active.add('input_file_i');
+      }}
       document.querySelectorAll('.rack-row').forEach((row) => {{
         const id = row.getAttribute('data-assembly');
         row.classList.toggle('active', active.has(id));
@@ -499,9 +594,29 @@ def render_animation_html(
       }} else {{
         energizedOutputs.innerHTML = rows.map((row) => {{
           const ft = row.field_terminal ? ` FT ${'{'}row.field_terminal{'}'}` : '';
-          return `<div class="output on-${'{'}row.indication{'}'}">${'{'}row.output_id{'}'}${'{'}ft{'}'}  |  Ph${'{'}row.phase{'}'} ${'{'}row.indication{'}'}  |  ${'{'}row.label{'}'}</div>`;
+          const pedClass = row.channel_kind === 'ped' ? ' ped' : '';
+          return `<div class="output on-${'{'}row.indication{'}'}${'{'}pedClass{'}'}">${'{'}row.output_id{'}'}${'{'}ft{'}'}  |  Ph${'{'}row.phase{'}'} ${'{'}row.indication{'}'}  |  ${'{'}row.label{'}'}</div>`;
         }}).join('');
       }}
+      const serving = new Set(current.phases || []);
+      document.querySelectorAll('.det-row').forEach((row) => {{
+        const phase = Number(row.getAttribute('data-phase'));
+        const box = row.querySelector('.det-switch');
+        const status = row.querySelector('.det-status');
+        const on = box && box.checked;
+        let text = 'idle';
+        row.classList.remove('active-serving', 'active-call');
+        if (on && serving.has(phase) && current.state === 'green') {{
+          text = 'extending green (presentation)';
+          row.classList.add('active-serving');
+        }} else if (on) {{
+          text = 'call latched / waiting';
+          row.classList.add('active-call');
+        }} else if (serving.has(phase)) {{
+          text = 'phase active';
+        }}
+        if (status) status.textContent = text;
+      }});
     }}
 
     function showFrame(nextIndex) {{
@@ -585,6 +700,10 @@ def render_animation_html(
     [cycleTiming, greenTiming, yellowTiming, redTiming, ...phaseControls].forEach((control) => control.addEventListener('input', () => {{
       refreshTimingLabels();
       rebuildDurations();
+    }}));
+    detSwitches.forEach((control) => control.addEventListener('change', () => {{
+      rebuildDurations();
+      renderTeach(meta[index]);
     }}));
 
     scrub.max = frames.length - 1;

@@ -52,6 +52,19 @@ class WiringChannel:
     movement_group: str = ""
     street_role: str = ""
     head_type: str = ""
+    field_terminal: str = ""
+    cabinet_assembly: str = ""
+    channel_kind: str = "vehicle"
+
+
+@dataclass(frozen=True)
+class DetectorChannel:
+    detector_id: str
+    label: str
+    connect: str
+    phase: int
+    kind: str = "vehicle"
+    plan_ref: str = "J-80.15"
 
 
 @dataclass
@@ -66,6 +79,7 @@ class Wsdot8PhaseConfig:
     timing_steps: List[TimingStep]
     tick_seconds: int
     wiring_channels: List[WiringChannel]
+    detector_channels: List[DetectorChannel] = field(default_factory=list)
 
 
 def _project_root() -> Path:
@@ -142,13 +156,32 @@ def load_config(path: Optional[Path] = None) -> Wsdot8PhaseConfig:
             approach=_approach_from_movement(
                 phase_details[int(c["phase"])].movement
             ),
-            movement_group=_movement_group(
-                phase_details[int(c["phase"])].movement
+            movement_group=(
+                "ped"
+                if c.get("channel_kind") == "ped"
+                else _movement_group(phase_details[int(c["phase"])].movement)
             ),
             street_role=phase_details[int(c["phase"])].street_role,
-            head_type=_head_type(c["indication"], c["label"]),
+            head_type=_head_type(c["indication"], c["label"], c.get("channel_kind", "vehicle")),
+            field_terminal=str(c.get("field_terminal", "")),
+            cabinet_assembly=str(
+                c.get("cabinet_assembly", "Output File #1 LX")
+            ),
+            channel_kind=str(c.get("channel_kind", "vehicle")),
         )
         for c in raw["wiring"]["channels"]
+    ]
+
+    detector_channels = [
+        DetectorChannel(
+            detector_id=str(d["detector_id"]),
+            label=str(d["label"]),
+            connect=str(d["connect"]),
+            phase=int(d["phase"]),
+            kind=str(d.get("kind", "vehicle")),
+            plan_ref=str(d.get("plan_ref", "J-80.15")),
+        )
+        for d in raw.get("wiring", {}).get("detectors", [])
     ]
 
     return Wsdot8PhaseConfig(
@@ -162,6 +195,7 @@ def load_config(path: Optional[Path] = None) -> Wsdot8PhaseConfig:
         timing_steps=timing_steps,
         tick_seconds=int(tp.get("tick_seconds", 1)),
         wiring_channels=wiring_channels,
+        detector_channels=detector_channels,
     )
 
 
@@ -185,7 +219,9 @@ def _movement_group(movement: str) -> str:
     return "other"
 
 
-def _head_type(indication: str, label: str) -> str:
+def _head_type(indication: str, label: str, channel_kind: str = "vehicle") -> str:
+    if channel_kind == "ped" or "ped" in label.lower() or "walk" in label.lower():
+        return "ped"
     if "arrow" in label.lower():
         return "arrow"
     if "ball" in label.lower():

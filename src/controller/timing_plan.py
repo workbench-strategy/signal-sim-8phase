@@ -6,7 +6,7 @@ from typing import Optional, Set
 
 from src.controller.dual_ring import DualRingController
 from src.controller.models import ControllerSnapshot, RingPositions, StepPhase
-from src.controller.outputs import phase_states_for_step
+from src.controller.outputs import ped_states_for_step, phase_states_for_step
 from src.data.loader import TimingStep, Wsdot8PhaseConfig
 
 
@@ -46,6 +46,7 @@ class TimingPlanRunner:
             states = phase_states_for_step(
                 self._config, StepPhase.ALL_RED, set(), set()
             )
+            ped_states = ped_states_for_step(StepPhase.ALL_RED, set(), set())
             return ControllerSnapshot(
                 step_index=max(0, self._step_index - 1),
                 step_label="Plan complete",
@@ -58,6 +59,7 @@ class TimingPlanRunner:
                 phase_states=states,
                 active_greens=set(),
                 plan_finished=True,
+                ped_states=ped_states,
             )
 
         greens = self._active_greens if self._step_phase == StepPhase.GREEN else set()
@@ -67,6 +69,11 @@ class TimingPlanRunner:
         total = step.green_time_s + step.yellow_clearance_s + step.all_red_s
         states = phase_states_for_step(
             self._config,
+            self._step_phase,
+            self._active_greens,
+            self._yellow_phases,
+        )
+        ped_states = ped_states_for_step(
             self._step_phase,
             self._active_greens,
             self._yellow_phases,
@@ -84,6 +91,7 @@ class TimingPlanRunner:
             phase_states=states,
             active_greens=set(self._active_greens),
             plan_finished=False,
+            ped_states=ped_states,
         )
 
     def tick(self) -> ControllerSnapshot:

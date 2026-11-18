@@ -1,0 +1,22 @@
+-- NTCIP 1201 Global Objects (illustrative snippet for scaffold docs)
+-- NOT a complete / normative MIB. Align with your certified module.
+--
+-- NEMA enterprise: 1.3.6.1.4.1.1206
+-- profiles.global: 1.3.6.1.4.1.1206.4.2.6
+
+UNIT-ID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Unique identification of the field unit."
+    ::= { unit 3 }
+
+UNIT-LOCATION OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Location description of the field unit."
+    ::= { unit 7 }
+
+-- DateAndTime ::= OCTET STRING (SIZE (8))
+-- YYYY(2) MM DD HH MM SS deci-second

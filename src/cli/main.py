@@ -57,7 +57,7 @@ def _cmd_wiring(args: argparse.Namespace) -> None:
     wiring = WiringTable.from_config(load_config(args.config))
     snap = runner.snapshot()
     print(snap.title_line())
-    print(format_energized_panel(wiring, snap.phase_states))
+    print(format_energized_panel(wiring, snap.phase_states, ped_states=snap.ped_states))
 
 
 def _cmd_wiring_summary(args: argparse.Namespace) -> None:

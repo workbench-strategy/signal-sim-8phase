@@ -113,7 +113,8 @@ def test_animate2d_exports_html(capsys, mini_config_path, tmp_path):
         assert output.exists()
         html = output.read_text(encoding="utf-8")
         assert "<svg" in html
-        assert "Signal Sim 8-Phase 2D Animation" in html
+        assert "Signal Sim 8-Phase Teach Mode" in html
+        assert "Type 332 cabinet" in html
     finally:
         sys.argv = original_argv
 

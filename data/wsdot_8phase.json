@@ -11,52 +11,232 @@
       "description": "On each approach, through_phase + left_phase equals 7 (major) or 11 (minor)"
     },
     "approach_pairs": [
-      {"through": 2, "left": 5, "approach": "northbound", "street_role": "major", "sum": 7},
-      {"through": 6, "left": 1, "approach": "southbound", "street_role": "major", "sum": 7},
-      {"through": 4, "left": 7, "approach": "westbound", "street_role": "minor", "sum": 11},
-      {"through": 8, "left": 3, "approach": "eastbound", "street_role": "minor", "sum": 11}
+      {
+        "through": 2,
+        "left": 5,
+        "approach": "northbound",
+        "street_role": "major",
+        "sum": 7
+      },
+      {
+        "through": 6,
+        "left": 1,
+        "approach": "southbound",
+        "street_role": "major",
+        "sum": 7
+      },
+      {
+        "through": 4,
+        "left": 7,
+        "approach": "westbound",
+        "street_role": "minor",
+        "sum": 11
+      },
+      {
+        "through": 8,
+        "left": 3,
+        "approach": "eastbound",
+        "street_role": "minor",
+        "sum": 11
+      }
     ],
     "preemption_channels": {
-      "A": [2, 5],
-      "B": [4, 7],
-      "C": [1, 6],
-      "D": [3, 8]
+      "A": [
+        2,
+        5
+      ],
+      "B": [
+        4,
+        7
+      ],
+      "C": [
+        1,
+        6
+      ],
+      "D": [
+        3,
+        8
+      ]
     }
   },
   "intersection_layout": {
     "intersection_legs": {
-      "north": {"phases": [5, 2], "description": "NB left (5) + NB thru (2), sum=7"},
-      "south": {"phases": [1, 6], "description": "SB left (1) + SB thru (6), sum=7"},
-      "west": {"phases": [7, 4], "description": "WB left (7) + WB thru (4), sum=11"},
-      "east": {"phases": [3, 8], "description": "EB left (3) + EB thru (8), sum=11"}
+      "north": {
+        "phases": [
+          5,
+          2
+        ],
+        "description": "NB left (5) + NB thru (2), sum=7"
+      },
+      "south": {
+        "phases": [
+          1,
+          6
+        ],
+        "description": "SB left (1) + SB thru (6), sum=7"
+      },
+      "west": {
+        "phases": [
+          7,
+          4
+        ],
+        "description": "WB left (7) + WB thru (4), sum=11"
+      },
+      "east": {
+        "phases": [
+          3,
+          8
+        ],
+        "description": "EB left (3) + EB thru (8), sum=11"
+      }
     },
     "phase_details": {
-      "1": {"movement": "southbound_left", "leg": "south", "street_role": "major", "short": "SB Left", "full": "Phase 1 - SB protected left (6+1=7)"},
-      "2": {"movement": "northbound_through", "leg": "north", "street_role": "major", "short": "NB Thru", "full": "Phase 2 - NB through (2+5=7)"},
-      "3": {"movement": "eastbound_left", "leg": "east", "street_role": "minor", "short": "EB Left", "full": "Phase 3 - EB protected left (8+3=11)"},
-      "4": {"movement": "westbound_through", "leg": "west", "street_role": "minor", "short": "WB Thru", "full": "Phase 4 - WB through (4+7=11)"},
-      "5": {"movement": "northbound_left", "leg": "north", "street_role": "major", "short": "NB Left", "full": "Phase 5 - NB protected left (2+5=7)"},
-      "6": {"movement": "southbound_through", "leg": "south", "street_role": "major", "short": "SB Thru", "full": "Phase 6 - SB through (6+1=7)"},
-      "7": {"movement": "westbound_left", "leg": "west", "street_role": "minor", "short": "WB Left", "full": "Phase 7 - WB protected left (4+7=11)"},
-      "8": {"movement": "eastbound_through", "leg": "east", "street_role": "minor", "short": "EB Thru", "full": "Phase 8 - EB through (8+3=11)"}
+      "1": {
+        "movement": "southbound_left",
+        "leg": "south",
+        "street_role": "major",
+        "short": "SB Left",
+        "full": "Phase 1 - SB protected left (6+1=7)"
+      },
+      "2": {
+        "movement": "northbound_through",
+        "leg": "north",
+        "street_role": "major",
+        "short": "NB Thru",
+        "full": "Phase 2 - NB through (2+5=7)"
+      },
+      "3": {
+        "movement": "eastbound_left",
+        "leg": "east",
+        "street_role": "minor",
+        "short": "EB Left",
+        "full": "Phase 3 - EB protected left (8+3=11)"
+      },
+      "4": {
+        "movement": "westbound_through",
+        "leg": "west",
+        "street_role": "minor",
+        "short": "WB Thru",
+        "full": "Phase 4 - WB through (4+7=11)"
+      },
+      "5": {
+        "movement": "northbound_left",
+        "leg": "north",
+        "street_role": "major",
+        "short": "NB Left",
+        "full": "Phase 5 - NB protected left (2+5=7)"
+      },
+      "6": {
+        "movement": "southbound_through",
+        "leg": "south",
+        "street_role": "major",
+        "short": "SB Thru",
+        "full": "Phase 6 - SB through (6+1=7)"
+      },
+      "7": {
+        "movement": "westbound_left",
+        "leg": "west",
+        "street_role": "minor",
+        "short": "WB Left",
+        "full": "Phase 7 - WB protected left (4+7=11)"
+      },
+      "8": {
+        "movement": "eastbound_through",
+        "leg": "east",
+        "street_role": "minor",
+        "short": "EB Thru",
+        "full": "Phase 8 - EB through (8+3=11)"
+      }
     }
   },
   "dual_ring": {
-    "ring_1": [1, 2, 3, 4],
-    "ring_2": [5, 6, 7, 8],
+    "ring_1": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "ring_2": [
+      5,
+      6,
+      7,
+      8
+    ],
     "barriers": [
-      {"id": "barrier_23", "between": [2, 3], "description": "Ring 1 barrier between phases 2 and 3"},
-      {"id": "barrier_67", "between": [6, 7], "description": "Ring 2 barrier between phases 6 and 7"}
+      {
+        "id": "barrier_23",
+        "between": [
+          2,
+          3
+        ],
+        "description": "Ring 1 barrier between phases 2 and 3"
+      },
+      {
+        "id": "barrier_67",
+        "between": [
+          6,
+          7
+        ],
+        "description": "Ring 2 barrier between phases 6 and 7"
+      }
     ],
     "concurrent_groups": [
-      {"phases": [2, 5], "label": "NB approach (Channel A, thru+left=7)"},
-      {"phases": [1, 6], "label": "SB approach (Channel C, thru+left=7)"},
-      {"phases": [4, 7], "label": "WB approach (Channel B, thru+left=11)"},
-      {"phases": [3, 8], "label": "EB approach (Channel D, thru+left=11)"},
-      {"phases": [1, 5], "label": "Both major lefts (leading-lefts timing step)"},
-      {"phases": [2, 6], "label": "Both major throughs"},
-      {"phases": [4, 8], "label": "Both minor throughs"},
-      {"phases": [3, 7], "label": "Both minor lefts (lagging-lefts timing step)"}
+      {
+        "phases": [
+          2,
+          5
+        ],
+        "label": "NB approach (Channel A, thru+left=7)"
+      },
+      {
+        "phases": [
+          1,
+          6
+        ],
+        "label": "SB approach (Channel C, thru+left=7)"
+      },
+      {
+        "phases": [
+          4,
+          7
+        ],
+        "label": "WB approach (Channel B, thru+left=11)"
+      },
+      {
+        "phases": [
+          3,
+          8
+        ],
+        "label": "EB approach (Channel D, thru+left=11)"
+      },
+      {
+        "phases": [
+          1,
+          5
+        ],
+        "label": "Both major lefts (leading-lefts timing step)"
+      },
+      {
+        "phases": [
+          2,
+          6
+        ],
+        "label": "Both major throughs"
+      },
+      {
+        "phases": [
+          4,
+          8
+        ],
+        "label": "Both minor throughs"
+      },
+      {
+        "phases": [
+          3,
+          7
+        ],
+        "label": "Both minor lefts (lagging-lefts timing step)"
+      }
     ]
   },
   "timing_plan": {
@@ -65,28 +245,40 @@
     "steps": [
       {
         "label": "Major street protected lefts (Ph 1 SB + Ph 5 NB)",
-        "greens": [1, 5],
+        "greens": [
+          1,
+          5
+        ],
         "green_time_s": 5,
         "yellow_clearance_s": 3,
         "all_red_s": 2
       },
       {
         "label": "Major street through (Ph 2 NB + Ph 6 SB)",
-        "greens": [2, 6],
+        "greens": [
+          2,
+          6
+        ],
         "green_time_s": 5,
         "yellow_clearance_s": 3,
         "all_red_s": 2
       },
       {
         "label": "Minor street protected lefts (Ph 3 EB + Ph 7 WB)",
-        "greens": [3, 7],
+        "greens": [
+          3,
+          7
+        ],
         "green_time_s": 5,
         "yellow_clearance_s": 3,
         "all_red_s": 2
       },
       {
         "label": "Minor street through (Ph 4 WB + Ph 8 EB)",
-        "greens": [4, 8],
+        "greens": [
+          4,
+          8
+        ],
         "green_time_s": 5,
         "yellow_clearance_s": 3,
         "all_red_s": 2
@@ -95,30 +287,457 @@
   },
   "wiring": {
     "channels": [
-      {"output_id": "OUT-01", "phase": 1, "indication": "green", "label": "Phase 1 green arrow (SB left)", "wsdot_ref": "1330.pdf Channel C"},
-      {"output_id": "OUT-02", "phase": 1, "indication": "yellow", "label": "Phase 1 yellow arrow (SB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-03", "phase": 1, "indication": "red", "label": "Phase 1 red (SB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-04", "phase": 2, "indication": "green", "label": "Phase 2 green ball (NB thru)", "wsdot_ref": "1330.pdf Channel A"},
-      {"output_id": "OUT-05", "phase": 2, "indication": "yellow", "label": "Phase 2 yellow ball (NB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-06", "phase": 2, "indication": "red", "label": "Phase 2 red (NB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-07", "phase": 3, "indication": "green", "label": "Phase 3 green arrow (EB left)", "wsdot_ref": "1330.pdf Channel D"},
-      {"output_id": "OUT-08", "phase": 3, "indication": "yellow", "label": "Phase 3 yellow arrow (EB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-09", "phase": 3, "indication": "red", "label": "Phase 3 red (EB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-10", "phase": 4, "indication": "green", "label": "Phase 4 green ball (WB thru)", "wsdot_ref": "1330.pdf Channel B"},
-      {"output_id": "OUT-11", "phase": 4, "indication": "yellow", "label": "Phase 4 yellow ball (WB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-12", "phase": 4, "indication": "red", "label": "Phase 4 red (WB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-13", "phase": 5, "indication": "green", "label": "Phase 5 green arrow (NB left)", "wsdot_ref": "1330.pdf Channel A"},
-      {"output_id": "OUT-14", "phase": 5, "indication": "yellow", "label": "Phase 5 yellow arrow (NB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-15", "phase": 5, "indication": "red", "label": "Phase 5 red (NB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-16", "phase": 6, "indication": "green", "label": "Phase 6 green ball (SB thru)", "wsdot_ref": "1330.pdf Channel C"},
-      {"output_id": "OUT-17", "phase": 6, "indication": "yellow", "label": "Phase 6 yellow ball (SB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-18", "phase": 6, "indication": "red", "label": "Phase 6 red (SB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-19", "phase": 7, "indication": "green", "label": "Phase 7 green arrow (WB left)", "wsdot_ref": "1330.pdf Channel B"},
-      {"output_id": "OUT-20", "phase": 7, "indication": "yellow", "label": "Phase 7 yellow arrow (WB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-21", "phase": 7, "indication": "red", "label": "Phase 7 red (WB left)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-22", "phase": 8, "indication": "green", "label": "Phase 8 green ball (EB thru)", "wsdot_ref": "1330.pdf Channel D"},
-      {"output_id": "OUT-23", "phase": 8, "indication": "yellow", "label": "Phase 8 yellow ball (EB thru)", "wsdot_ref": "1330.pdf"},
-      {"output_id": "OUT-24", "phase": 8, "indication": "red", "label": "Phase 8 red (EB thru)", "wsdot_ref": "1330.pdf"}
+      {
+        "output_id": "OUT-01",
+        "phase": 1,
+        "indication": "green",
+        "label": "Phase 1 green arrow (SB left)",
+        "wsdot_ref": "1330.pdf Channel C; J-80.12 FT 613",
+        "field_terminal": "613",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-02",
+        "phase": 1,
+        "indication": "yellow",
+        "label": "Phase 1 yellow arrow (SB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 612",
+        "field_terminal": "612",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-03",
+        "phase": 1,
+        "indication": "red",
+        "label": "Phase 1 red (SB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 611",
+        "field_terminal": "611",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-04",
+        "phase": 2,
+        "indication": "green",
+        "label": "Phase 2 green ball (NB thru)",
+        "wsdot_ref": "1330.pdf Channel A; J-80.12 FT 623",
+        "field_terminal": "623",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-05",
+        "phase": 2,
+        "indication": "yellow",
+        "label": "Phase 2 yellow ball (NB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 622",
+        "field_terminal": "622",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-06",
+        "phase": 2,
+        "indication": "red",
+        "label": "Phase 2 red (NB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 621",
+        "field_terminal": "621",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-07",
+        "phase": 3,
+        "indication": "green",
+        "label": "Phase 3 green arrow (EB left)",
+        "wsdot_ref": "1330.pdf Channel D; J-80.12 FT 633",
+        "field_terminal": "633",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-08",
+        "phase": 3,
+        "indication": "yellow",
+        "label": "Phase 3 yellow arrow (EB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 632",
+        "field_terminal": "632",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-09",
+        "phase": 3,
+        "indication": "red",
+        "label": "Phase 3 red (EB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 631",
+        "field_terminal": "631",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-10",
+        "phase": 4,
+        "indication": "green",
+        "label": "Phase 4 green ball (WB thru)",
+        "wsdot_ref": "1330.pdf Channel B; J-80.12 FT 643",
+        "field_terminal": "643",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-11",
+        "phase": 4,
+        "indication": "yellow",
+        "label": "Phase 4 yellow ball (WB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 642",
+        "field_terminal": "642",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-12",
+        "phase": 4,
+        "indication": "red",
+        "label": "Phase 4 red (WB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 641",
+        "field_terminal": "641",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-13",
+        "phase": 5,
+        "indication": "green",
+        "label": "Phase 5 green arrow (NB left)",
+        "wsdot_ref": "1330.pdf Channel A; J-80.12 FT 653",
+        "field_terminal": "653",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-14",
+        "phase": 5,
+        "indication": "yellow",
+        "label": "Phase 5 yellow arrow (NB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 652",
+        "field_terminal": "652",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-15",
+        "phase": 5,
+        "indication": "red",
+        "label": "Phase 5 red (NB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 651",
+        "field_terminal": "651",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-16",
+        "phase": 6,
+        "indication": "green",
+        "label": "Phase 6 green ball (SB thru)",
+        "wsdot_ref": "1330.pdf Channel C; J-80.12 FT 663",
+        "field_terminal": "663",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-17",
+        "phase": 6,
+        "indication": "yellow",
+        "label": "Phase 6 yellow ball (SB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 662",
+        "field_terminal": "662",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-18",
+        "phase": 6,
+        "indication": "red",
+        "label": "Phase 6 red (SB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 661",
+        "field_terminal": "661",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-19",
+        "phase": 7,
+        "indication": "green",
+        "label": "Phase 7 green arrow (WB left)",
+        "wsdot_ref": "1330.pdf Channel B; J-80.12 FT 673",
+        "field_terminal": "673",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-20",
+        "phase": 7,
+        "indication": "yellow",
+        "label": "Phase 7 yellow arrow (WB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 672",
+        "field_terminal": "672",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-21",
+        "phase": 7,
+        "indication": "red",
+        "label": "Phase 7 red (WB left)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 671",
+        "field_terminal": "671",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-22",
+        "phase": 8,
+        "indication": "green",
+        "label": "Phase 8 green ball (EB thru)",
+        "wsdot_ref": "1330.pdf Channel D; J-80.12 FT 683",
+        "field_terminal": "683",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-23",
+        "phase": 8,
+        "indication": "yellow",
+        "label": "Phase 8 yellow ball (EB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 682",
+        "field_terminal": "682",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "OUT-24",
+        "phase": 8,
+        "indication": "red",
+        "label": "Phase 8 red (EB thru)",
+        "wsdot_ref": "1330.pdf; J-80.12 FT 681",
+        "field_terminal": "681",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "vehicle"
+      },
+      {
+        "output_id": "PED-01",
+        "phase": 2,
+        "indication": "green",
+        "label": "Phase 2 ped WALK",
+        "wsdot_ref": "J-80.12 2PG FT 722",
+        "field_terminal": "722",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-02",
+        "phase": 2,
+        "indication": "yellow",
+        "label": "Phase 2 ped FDW / ped clearance",
+        "wsdot_ref": "J-80.12 2PY (no WSDOT yellow label on plan)",
+        "field_terminal": "",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-03",
+        "phase": 2,
+        "indication": "red",
+        "label": "Phase 2 ped DON'T WALK",
+        "wsdot_ref": "J-80.12 2PR FT 721",
+        "field_terminal": "721",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-04",
+        "phase": 4,
+        "indication": "green",
+        "label": "Phase 4 ped WALK",
+        "wsdot_ref": "J-80.12 4PG FT 742",
+        "field_terminal": "742",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-05",
+        "phase": 4,
+        "indication": "yellow",
+        "label": "Phase 4 ped FDW / ped clearance",
+        "wsdot_ref": "J-80.12 4PY (no WSDOT yellow label on plan)",
+        "field_terminal": "",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-06",
+        "phase": 4,
+        "indication": "red",
+        "label": "Phase 4 ped DON'T WALK",
+        "wsdot_ref": "J-80.12 4PR FT 741",
+        "field_terminal": "741",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-07",
+        "phase": 6,
+        "indication": "green",
+        "label": "Phase 6 ped WALK",
+        "wsdot_ref": "J-80.12 6PG FT 762",
+        "field_terminal": "762",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-08",
+        "phase": 6,
+        "indication": "yellow",
+        "label": "Phase 6 ped FDW / ped clearance",
+        "wsdot_ref": "J-80.12 6PY (no WSDOT yellow label on plan)",
+        "field_terminal": "",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-09",
+        "phase": 6,
+        "indication": "red",
+        "label": "Phase 6 ped DON'T WALK",
+        "wsdot_ref": "J-80.12 6PR FT 761",
+        "field_terminal": "761",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-10",
+        "phase": 8,
+        "indication": "green",
+        "label": "Phase 8 ped WALK",
+        "wsdot_ref": "J-80.12 8PG FT 782",
+        "field_terminal": "782",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-11",
+        "phase": 8,
+        "indication": "yellow",
+        "label": "Phase 8 ped FDW / ped clearance",
+        "wsdot_ref": "J-80.12 8PY (no WSDOT yellow label on plan)",
+        "field_terminal": "",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      },
+      {
+        "output_id": "PED-12",
+        "phase": 8,
+        "indication": "red",
+        "label": "Phase 8 ped DON'T WALK",
+        "wsdot_ref": "J-80.12 8PR FT 781",
+        "field_terminal": "781",
+        "cabinet_assembly": "Output File #1 LX",
+        "channel_kind": "ped"
+      }
+    ],
+    "cabinet": {
+      "standard_plan": "J-80.10",
+      "cabinet_type": "Type 332",
+      "controller": "Type 2070",
+      "output_file": "Output File #1 LX",
+      "field_terminal_plan": "J-80.12",
+      "detector_test_plan": "J-80.15",
+      "notes": "Placeholder OUT-xx ids map 1:1 to phase G/Y/R; field_terminal uses WSDOT terminal numbers from J-80.12."
+    },
+    "detectors": [
+      {
+        "detector_id": "DET1",
+        "label": "DET. 1",
+        "connect": "I-1F",
+        "phase": 1,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "DET2",
+        "label": "DET. 2",
+        "connect": "I-1W",
+        "phase": 2,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "DET3",
+        "label": "DET. 3",
+        "connect": "I-2F",
+        "phase": 3,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "DET4",
+        "label": "DET. 4",
+        "connect": "I-2W",
+        "phase": 4,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "DET5",
+        "label": "DET. 5",
+        "connect": "I-3F",
+        "phase": 5,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "DET6",
+        "label": "DET. 6",
+        "connect": "I-3W",
+        "phase": 6,
+        "kind": "vehicle",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "PED2",
+        "label": "\u00d82 PED",
+        "connect": "\u00d82 PED pin",
+        "phase": 2,
+        "kind": "ped",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "PED4",
+        "label": "\u00d84 PED",
+        "connect": "\u00d84 PED pin",
+        "phase": 4,
+        "kind": "ped",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "PED6",
+        "label": "\u00d86 PED",
+        "connect": "\u00d86 PED pin",
+        "phase": 6,
+        "kind": "ped",
+        "plan_ref": "J-80.15"
+      },
+      {
+        "detector_id": "PED8",
+        "label": "\u00d88 PED",
+        "connect": "\u00d88 PED pin",
+        "phase": 8,
+        "kind": "ped",
+        "plan_ref": "J-80.15"
+      }
     ]
   }
 }

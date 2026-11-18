@@ -24,22 +24,25 @@ def test_grouped_channels_support_first_layer_queries():
     by_approach = table.channels_by_approach()
     by_head_type = table.channels_by_head_type()
 
-    assert 2 in by_phase and len(by_phase[2]) == 3
+    assert 2 in by_phase and len(by_phase[2]) == 6  # vehicle R/Y/G + ped R/Y/G
     assert by_approach["NB"]
     assert by_approach["SB"]
     assert by_approach["WB"]
     assert by_approach["EB"]
     assert "ball" in by_head_type
     assert "arrow" in by_head_type
+    assert "ped" in by_head_type
 
 
 def test_summary_rows_include_compact_phase_table():
     config = load_config()
     table = WiringTable.from_config(config)
     rows = table.summary_rows()
-    assert len(rows) == 8
+    assert len(rows) == 12  # 8 vehicle phase rows + 4 ped rows
     assert any("G:OUT" in row for row in rows)
     assert any("Y:OUT" in row for row in rows)
     assert any("R:OUT" in row for row in rows)
     assert any("arrow" in row for row in rows)
     assert any("ball" in row for row in rows)
+    assert any("ped" in row for row in rows)
+    assert any("G:PED" in row for row in rows)
